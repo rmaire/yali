@@ -146,7 +146,7 @@ public class Control implements ProcedureProvider {
                 Node ast = it.read(iftrue.toList());
                 ifexprsToRun.addAll(ast.getChildren());
             } else {
-                result = it.output(Node.nil());
+//                result = it.output(Node.nil());
                 return Node.nil();
             }
 
@@ -287,7 +287,7 @@ public class Control implements ProcedureProvider {
     }
 
     public Node output(Scope scope, java.util.List<Node> args) {
-        return it.output(args.get(0));
+        return args.get(0);
     }
 
     public Node stop(Scope scope, java.util.List<Node> args) {

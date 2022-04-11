@@ -69,7 +69,10 @@ public class Interpreter implements OutputObserver {
     }
 
     /**
-     * Interpreting functionality, public interface
+     * Runs a list of procedure calls
+     * @param A node which is expected to be of list type. All children will be 
+     * run first-to-last
+     * @return Returns the last evaluated result
      */
     public Node run(Node node) {
         tracers.forEach(t -> t.run(node));
@@ -86,6 +89,11 @@ public class Interpreter implements OutputObserver {
         return run();
     }
 
+    /**
+     * Runs a single procedure calls
+     * @param A valid call object
+     * @return Returns the last evaluated result
+     */
     public Node run(Call call) {
         tracers.forEach(t -> t.run(call));
 
@@ -94,18 +102,24 @@ public class Interpreter implements OutputObserver {
         return run();
     }
 
+    /**
+     * Runs a previously preloaded interpreter. Can be loaded with load()
+     * @return Returns the last evaluated result
+     */
     public Node run() {
         while (tick()) {
         }
 
         return lastResult;
     }
-//
-//    public void load(Call call) {
-//        tracers.forEach(t -> t.load(call));
-//        program.add(call);
-//    }
 
+    /**
+     * Loads a list of procedure calls or other nodes into the interpreter for 
+     * further evaluation. Only lists or calls are scheduled for evaluation. The 
+     * value of a reference is stored in the last result, every other type is 
+     * stored directly in the last result.
+     * @param  A node which is expected to be of list type.
+     */    
     public void load(Node node) {
         tracers.forEach(t -> t.load(node));
 
@@ -129,6 +143,7 @@ public class Interpreter implements OutputObserver {
         }
     }
 
+    @Deprecated
     public Node runBounded(Node node) {
 //        tracers.forEach(t -> t.run(node));
         saveStack();
@@ -148,6 +163,7 @@ public class Interpreter implements OutputObserver {
         return lastResult;
     }
 
+    @Deprecated
     private void saveStack() {
         bounded = true;
         saveStack = stack;
@@ -158,12 +174,17 @@ public class Interpreter implements OutputObserver {
         bounded = false;
     }
 
+    @Deprecated
     private void restoreStack() {
         stack = saveStack;
         program = saveProgram;
         bounded = false;
     }
 
+    /**
+     * Resumes evaluation after a pause call.
+     * @return Returns the last evaluated result
+     */
     public Node resume() {
         tracers.forEach(t -> t.resume(stack.peek()));
         paused = false;
@@ -174,40 +195,74 @@ public class Interpreter implements OutputObserver {
         return lastResult;
     }
 
+    /**
+     * Pauses the interpreter. This method is intended to be used by native calls 
+     * only. Use at your own risk. Resume with the resume() Method.
+     */
     public void pause() {
         tracers.forEach(t -> t.pause(stack.peek()));
         paused = true;
     }
 
+    /**
+     * Used to check if the interpreter is paused. Useful e.g. for REPLs
+     * @return Pause status of the interpreter. Returns true if paused
+     */
     public boolean paused() {
         return paused;
     }
 
+    /**
+     * Parses an input string to a executable syntax tree
+     * @param Yali source code
+     * @return the parsed syntax tree, top element is always a list of procedure calls
+     */
     public Node read(String source) {
         return new Parser(this).read(source);
     }
 
+    /**
+     * Parses an input list to a executable syntax tree. This is useful e.g. for 
+     * control structures or other constructs which run a list as procedure calls
+     * @param Yali source code
+     * @return the parsed syntax tree, top element is always a list of procedure calls
+     */
     public Node read(ch.uprisesoft.yali.ast.node.List list) {
         return new Parser(this).read(list);
     }
 
+    /**
+     * Returns the environment at this moment with all defined scopes, procedures 
+     * and variables
+     * @return the environment
+     */
     public Environment env() {
         return env;
     }
 
-    public Node output(Node output) {
-        lastResult = output;
-        return output;
-    }
-
+    /**
+     * This is the main worker method of the interpreter.
+     * It does one atomic step per call. The interpreter primarily is a stack 
+     * machine, but because there can be multiple top-level commands scheduled,
+     * there is also a list for all loaded procedure calls. If the stack is empty,
+     * it moves the first Call from the program list to the execution stack. If
+     * there is a call on the stack, it checks if it's already evaluated. If yes,
+     * it is unscheduled from the stack, the result is bubbled up and the returns.
+     * If no, it first check if htere are more arguments to evaluate. If yes, it
+     * schedules the next one and returns. If no, the environment of the call is
+     * loaded with the arguments and continues to procedure evaluation.
+     * Evaluation differs for native calls and user defined calls. Native calls
+     * are handled with the BiFunctions defined in call definition, user defined
+     * calls have their
+     * 
+     * @return true if there is more to do and tick() can be called once more, false otherwise.
+     */
     public boolean tick() {
-//        System.out.println("Stack size: " + stack.size() + ", Program size: " + program.size() + ", Env size: " + env.size());
 
         /*
         Global Program state
          */
         if (paused) {
-//            System.out.println("LEAVING TICK WITH false IN paused");
             return false;
         }
 
@@ -219,13 +274,10 @@ public class Interpreter implements OutputObserver {
 
                 if (bounded) {
                     restoreStack();
-//                    System.out.println("LEAVING TICK WITH true IN stack.empty() -> program.isEmpty() -> bounded");
                     return true;
                 }
-//                System.out.println("LEAVING TICK WITH false IN stack.empty() -> program.isEmpty()");
                 return false;
             } else {
-//                System.out.println("LEAVING TICK WITH true IN stack.empty() -> !program.isEmpty()");
                 schedule(program.remove(0));
                 return true;
             }
@@ -234,29 +286,22 @@ public class Interpreter implements OutputObserver {
         /*
         Result handling
          */
-        // Check for finished procedures. If stack is 1 and program empty, this
+        // Check for finished procedures. A procedure is finished when evaluated()
+        // returns true. If stack is 1 and program empty, this
         // is the result. Else, deschedule the call and set the result to the
         // previous call. Has to be done before argument handling.
         if (stack.peek().evaluated()) {
-            if(stack.peek().getName().equals("run")) {
-//                System.out.println("RUN FINISHED IN TICK()");
-            }
             unschedule();
             if (stack.empty() && !program.isEmpty()) {
-//                System.out.println("LEAVING TICK WITH true IN stack.peek().evaluated() -> stack.empty() && !program.isEmpty()");
                 return true;
             } else if (stack.empty() && program.isEmpty()) {
-//                System.out.println("LEAVING TICK WITH false IN stack.peek().evaluated() -> stack.empty() && program.isEmpty()");
                 return false;
             } else if (stack.size() == 1 && stack.peek().evaluated() && program.isEmpty()) {
-//                System.out.println("LEAVING TICK WITH false IN stack.peek().evaluated() -> stack.size() == 1 && stack.peek().evaluated() && program.isEmpty()");
                 return false;
             } else if (stack.peek().hasMoreParameters()) {
-//                System.out.println("LEAVING TICK WITH true IN stack.peek().evaluated() -> stack.peek().hasMoreParameters()");
                 stack.peek().arg(lastResult);
                 return true;
             } else {
-//                System.out.println("LEAVING TICK WITH true IN stack.peek().evaluated() -> else");
                 return true;
             }
         }
@@ -264,6 +309,7 @@ public class Interpreter implements OutputObserver {
         /*
         Arguments evaluation
          */
+        
         // Arguments are evaluated first. If a call does not have it's argument
         // evaluated, schedule the next argument to be evaluated
         if (stack.peek().hasMoreParameters()) {
@@ -273,11 +319,9 @@ public class Interpreter implements OutputObserver {
             // If it's not a procedure call, no evaluation is necessary. Add to
             // arguments as-is.
             if (!nextParam.type().equals(NodeType.PROCCALL)) {
-//                System.out.println("LEAVING TICK WITH true IN stack.peek().hasMoreParameters() -> !nextParam.type().equals(NodeType.PROCCALL)");
                 stack.peek().arg(nextParam);
                 return true;
             } else {
-//                System.out.println("LEAVING TICK WITH true IN stack.peek().hasMoreParameters() -> else");
                 schedule(nextParam.toProcedureCall());
                 return true;
             }
@@ -299,22 +343,31 @@ public class Interpreter implements OutputObserver {
 
         if (call.definition().isNative()) {
             tracers.forEach(t -> t.callPrimitive(call.getName(), call.args(), env));
+            
+            // With a native call, the first BiFunction is applied. It should 
+            // return a result if it's a pure procedure or Node.boolean(true) if
+            // there are more steps necessary
             Node result = call.definition().getNativeCall().apply(env.peek(), call.args());
             
+            // If hte BiFunction callback for checking for more work returns true,
+            // the procedure will stay scheduled. As soon as it returns false, the
+            // call is marked as finished and descheduled in the next tick()
             if (!nodeIsTrue(call.definition().getHasMoreCallback().apply(env.peek(), result))) {
                 call.result(result, env.peek());
                 call.evaluated(true);
             }
-//            System.out.println("LEAVING TICK WITH true IN call.definition().isNative() -> true");
             return true;
         } else {
+            // Handling of user-defined procedure calls. If the procedure has more 
+            // calls in it's children list, the next one is scheduled. 
             if (call.hasMoreCalls()) {
                 schedule(call.nextCall());
             } else {
+                // A user derfined procedure call is evaluated as soon as it has no 
+                // more procedure calls in it's children list. 
                 call.evaluated(true);
                 call.result(lastResult, env.peek());
             }
-//            System.out.println("LEAVING TICK WITH true IN call.definition().isNative() -> false");
             return true;
         }
     }
@@ -378,16 +431,6 @@ public class Interpreter implements OutputObserver {
         com.registerProcedures(this);
 
         return loadStdLib(oo);
-    }
-
-    public java.util.List<String> stringify(Node arg) {
-        java.util.List<String> stringifiedArgs = new ArrayList<>();
-        if (arg.type().equals(NodeType.LIST)) {
-            stringifiedArgs.addAll(stringify(arg.getChildren()));
-        } else {
-            stringifiedArgs.add(arg.toString());
-        }
-        return stringifiedArgs;
     }
 
     public java.util.List<String> stringify(java.util.List<Node> args) {
