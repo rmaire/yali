@@ -1,5 +1,5 @@
-/*
- * Copyright 2020 rma.
+/* 
+ * Copyright 2020 Uprise Software.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package ch.uprisesoft.yali.runtime.io;
 
 /**
  *
- * @author rma
+ * @author uprisesoft@gmail.com
  */
 public interface InputReceiver {
     public void register(InputGenerator generator);

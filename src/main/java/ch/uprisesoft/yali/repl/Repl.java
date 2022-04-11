@@ -16,14 +16,13 @@
 package ch.uprisesoft.yali.repl;
 
 import ch.uprisesoft.yali.ast.node.Node;
-import ch.uprisesoft.yali.exception.NodeTypeException;
 import ch.uprisesoft.yali.ast.node.NodeType;
+import ch.uprisesoft.yali.exception.NodeTypeException;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
 import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
 import ch.uprisesoft.yali.scope.VariableNotFoundException;
 import java.awt.Desktop;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -32,9 +31,17 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import org.jline.builtins.Nano;
+import org.jline.reader.EndOfFileException;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.UserInterruptException;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 
 /**
  *
@@ -42,17 +49,17 @@ import java.util.stream.Collectors;
  */
 public class Repl implements InputGenerator, OutputObserver {
 
-    private final Interpreter interpreter;
-
     private final InputStreamReader input;
     private final PrintStream output;
 
+    private final Interpreter interpreter;
     private boolean procDefinitionMode = false;
-    private StringBuilder procDefinition;
-
     private ResourceBundle messages;
 
-    public Repl(InputStreamReader input, PrintStream output) {
+    private final Terminal terminal;
+    private final LineReader reader;
+
+    public Repl(InputStreamReader input, PrintStream output) throws IOException {
         this.input = input;
         this.output = output;
 
@@ -63,54 +70,65 @@ public class Repl implements InputGenerator, OutputObserver {
         interpreter = new Interpreter();
         interpreter.loadStdLib(this, this);
 
+        terminal = TerminalBuilder
+                .terminal();
+        reader = LineReaderBuilder.builder().terminal(terminal)
+                .build();
+
     }
 
-    public Repl() {
+    public Repl() throws IOException {
         this(new InputStreamReader(System.in), new PrintStream(System.out));
     }
 
     public void runPrompt() throws IOException, InterruptedException {
-        BufferedReader reader = new BufferedReader(input);
+        output.println("Welcome to Yali. To exit type ctrl-D or bye and press <ENTER>");
 
-        output.println("Welcome to Yali. To exit type bye and press <ENTER>");
-
-        for (;;) {
-
-            if (procDefinitionMode) {
-                output.print(": ");
-            } else {
-                output.print("> ");
+        while (true) {
+            String line = "";
+            try {
+                line = reader.readLine("> ");
+            } catch (UserInterruptException e) {
+                // Ignore
+            } catch (EndOfFileException e) {
+                return;
             }
 
-            output.flush();
-
-            String source = reader.readLine();
-
-            if (source.toLowerCase().equals("bye")) {
+            if (line.trim().toLowerCase().equals("bye")) {
                 break;
-            } else if (source.toLowerCase().startsWith("edit")) {
-//                editor e = new editor("Bla\\nBlubb");
-                editProc("");
-            }
+            } else if (line.toLowerCase().startsWith("edit")) {
+//                Path edit = Files.createTempFile("yali", ".tmp");
+//                BufferedWriter writer = new BufferedWriter(new FileWriter(edit.toFile()));
+//                writer.write("Bla\nBlubb");
+//                writer.close();
+//                Nano nano = new Nano(terminal, edit);
+//                System.out.println(edit.getFileName().toString());
+//                System.out.println(edit.toAbsolutePath().toString());
+//                nano.open(edit.toAbsolutePath().toString());
+//                nano.title = "Yali Editor";
+//                nano.run();
 
-            if (!procDefinitionMode && source.toLowerCase().startsWith("to")) {
-                procDefinitionMode = true;
-                procDefinition = new StringBuilder();
-                procDefinition.append(source).append("\n");
-            } else if (procDefinitionMode && source.toLowerCase().startsWith("end")) {
-                procDefinition.append(source).append("\n");
-                run(procDefinition.toString());
-                procDefinitionMode = false;
-            } else if (procDefinitionMode && !source.toLowerCase().startsWith("end")) {
-                procDefinition.append(source).append("\n");
+                String[] procLine = line.split(" ");
+                String editResult = "";
+                if (procLine.length > 1) {
+                    editResult = editProc(procLine[1]);
+                } else {
+                    editResult = editProc();
+                }
+
+                interpreter.read(editResult);
+
             } else {
-                run(source);
+                run(line);
             }
-
         }
     }
 
     private void run(String source) {
+        if (source == null || source.equals("")) {
+            return;
+        }
+
         try {
             Node result = interpreter.run(interpreter.read(source));
             output.println("; " + result.toString());
@@ -127,7 +145,7 @@ public class Repl implements InputGenerator, OutputObserver {
                 output.println(
                         String.format(
                                 "; " + messages.getString("redundant_argument"),
-                                nte.getNode().token().get(0).getLexeme(),
+                                nte.getNode().toString(),
                                 nte.getReceived()
                         )
                 );
@@ -135,7 +153,7 @@ public class Repl implements InputGenerator, OutputObserver {
                 output.println(
                         String.format(
                                 "; " + messages.getString("not_expected"),
-                                nte.getNode().toString(),
+                                nte.getNode().token().get(0).getLexeme(),
                                 nte.getExpected(),
                                 nte.getReceived()
                         )
@@ -151,16 +169,56 @@ public class Repl implements InputGenerator, OutputObserver {
         }
     }
 
-    private String editProc(String fun) throws IOException, InterruptedException {
+    private String editProc(String procName) throws IOException, InterruptedException {
 
         File file = File.createTempFile("temp", ".lgt");
         file.deleteOnExit();
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-        writer.write("Bla\nBlubb");
-        writer.close();
+        if (interpreter.env().defined(procName)) {
+            String proc = interpreter.env().procedure(procName).getSource();
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(proc);
+            writer.close();
+        } else {
+
+            String proc = "to " + procName + "\n" + "end";
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(proc);
+            writer.close();
+        }
 
 //        Files.write(file.toPath(), fun.);
+//        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+//            Process process = new ProcessBuilder()
+//                    .command("notepad.exe", file.toPath().toAbsolutePath().toString())
+//                    .directory(file.toPath().getParent().toFile())
+//                    .redirectErrorStream(true)
+//                    .start();
+//            process.waitFor();
+//        } else {
+//            Desktop.getDesktop().edit(file);
+//        }
+        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+            String cmd = "rundll32 url.dll,FileProtocolHandler " + file.getCanonicalPath();
+            Runtime.getRuntime().exec(cmd);
+        } else {
+            Desktop.getDesktop().edit(file);
+        }
+
+        String newContent = Files
+                .lines(file.toPath(), StandardCharsets.UTF_8)
+                .collect(Collectors.joining("\n"));
+
+//        System.out.println(newContent);
+        return newContent;
+    }
+
+    private String editProc() throws IOException, InterruptedException {
+
+        File file = File.createTempFile("temp", ".lgt");
+        file.deleteOnExit();
+
         if (System.getProperty("os.name").toLowerCase().contains("windows")) {
             Process process = new ProcessBuilder()
                     .command("notepad.exe", file.toPath().toAbsolutePath().toString())
@@ -176,8 +234,7 @@ public class Repl implements InputGenerator, OutputObserver {
                 .lines(file.toPath(), StandardCharsets.UTF_8)
                 .collect(Collectors.joining("\n"));
 
-        System.out.println(newContent);
-        
+//        System.out.println(newContent);
         return newContent;
     }
 
@@ -188,20 +245,13 @@ public class Repl implements InputGenerator, OutputObserver {
 
     @Override
     public String requestLine() {
-        BufferedReader reader = new BufferedReader(input);
-        String result = "";
-        try {
-            result = reader.readLine();
-        } catch (IOException ex) {
-            output.println(ex);
-        }
-
-        return result;
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void inform(String output) {
-        this.output.print(output);
+//        this.output.println();
+        this.output.println(output);
     }
 
 }

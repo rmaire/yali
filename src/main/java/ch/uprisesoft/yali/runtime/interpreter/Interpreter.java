@@ -1,5 +1,5 @@
-/*
- * Copyright 2021 rma.
+/* 
+ * Copyright 2020 Uprise Software.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import java.util.List;
 
 /**
  *
- * @author rma
+ * @author uprisesoft@gmail.com
  */
 public class Interpreter implements OutputObserver {
 

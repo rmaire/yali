@@ -1,5 +1,5 @@
-/*
- * Copyright 2021 rmaire.
+/* 
+ * Copyright 2020 Uprise Software.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  *
- * @author rmaire
+ * @author uprisesoft@gmail.com
  */
 public class LogicTest {
     

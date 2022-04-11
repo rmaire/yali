@@ -15,10 +15,7 @@
  */
 package ch.uprisesoft.yali.main;
 
-import ch.uprisesoft.yali.ast.node.List;
-import ch.uprisesoft.yali.ast.node.Node;
-import ch.uprisesoft.yali.repl.PrintingTracer;
-import ch.uprisesoft.yali.repl.Repl2;
+import ch.uprisesoft.yali.repl.Repl;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
 import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
@@ -60,7 +57,7 @@ public class Main {
         MockTurtleManager mtm = new MockTurtleManager();
         mtm.registerProcedures(it);
         
-        Repl2 repl = new Repl2();
+        Repl repl = new Repl();
         repl.runPrompt();
 
     }

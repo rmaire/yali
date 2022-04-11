@@ -1,5 +1,5 @@
-/*
- * Copyright 2020 rmaire.
+/* 
+ * Copyright 2020 Uprise Software.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  *
- * @author rmaire
+ * @author uprisesoft@gmail.com
  */
 public class Lexer {
 
