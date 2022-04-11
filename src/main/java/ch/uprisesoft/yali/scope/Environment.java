@@ -20,12 +20,20 @@ import ch.uprisesoft.yali.ast.node.Procedure;
 import ch.uprisesoft.yali.runtime.interpreter.Tracer;
 import ch.uprisesoft.yali.runtime.procedures.FunctionNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- *
+ *A datastructure to manage the scopes in a running program. Yali is dynamic 
+ * scoped. This means that variable resolution searches up the calling chain, and 
+ * not the lexical (written) definition of functions as most programming languages
+ * do. This has the advantage that nested calls behaves kind of like closures and
+ * enables some nice tricks with macros and global variables. It is also a little 
+ * bit more intuitive for children and absolute beginners (the target demography 
+ * for yali). 
+ * Neverthless it irks professional programmers because the scoping isn't as clear
+ * while reading code as with lexical scoping. Also, it is prone to overwriting
+ * variables in global scope.
+ * 
  * @author uprisesoft@gmail.com
  */
 public class Environment {
@@ -46,7 +54,7 @@ public class Environment {
         scopes.add(scope);
         for(int i = scopes.size() -2; i >= 0; i--) {
                 Scope currentScope = scopes.get(i);
-                if(scope.getScopeName().equals(currentScope.getScopeName())) {
+                if(scope.name().equals(currentScope.name())) {
 //                    for(int j = scopes.size()-1; j>=i; j--) {
 //                        scopes.remove(j);
 //                        scopes.add(currentScope);
@@ -76,13 +84,13 @@ public class Environment {
 
         tracers.forEach(t -> t.make(name, value, this));
         for (int i = scopes.size() - 1; i >= 0; i--) {
-            if (scopes.get(i).defined(name.toLowerCase())) {
-                scopes.get(i).define(name.toLowerCase(), value);
+            if (scopes.get(i).thingable(name.toLowerCase())) {
+                scopes.get(i).make(name.toLowerCase(), value);
                 return;
             }
         }
         
-        scopes.get(0).define(name.toLowerCase(), value);
+        scopes.get(0).make(name.toLowerCase(), value);
     }
 
     public void local(String name) {
@@ -93,8 +101,8 @@ public class Environment {
     public Node thing(String name) {
         
         for (int i = scopes.size() - 1; i >= 0; i--) {
-            if (scopes.get(i).defined(name.toLowerCase())) {
-                final Node ret = scopes.get(i).resolve(name.toLowerCase());
+            if (scopes.get(i).thingable(name.toLowerCase())) {
+                final Node ret = scopes.get(i).thing(name.toLowerCase());
                 tracers.forEach(t -> t.thing(name, ret, this));
                 return ret;
             }
@@ -106,7 +114,7 @@ public class Environment {
 
     public Boolean thingable(String name) {
         for (int i = scopes.size() - 1; i >= 0; i--) {
-            if (scopes.get(i).defined(name)) {
+            if (scopes.get(i).thingable(name)) {
                 return true;
             }
         }
@@ -119,30 +127,30 @@ public class Environment {
      */
     
     public void define(Procedure function) {
-        first().define(function.getName(), function);
+        first().make(function.getName(), function);
     }
 
     public Boolean defined(String name) {
-        return first().defined(name);
+        return first().thingable(name);
     }
     
     public Procedure procedure(String name) {
-        return first().resolve(name).toProcedureDef();
+        return first().thing(name).toProcedureDef();
     }
 
     public void alias(String original, String alias) {
-        if (!(first().defined(original))) {
+        if (!(first().thingable(original))) {
             throw new FunctionNotFoundException(original);
         }
 
-        first().define(alias, first().resolve(original));
+        first().make(alias, first().thing(original));
     }
     
     public String trace() {
         StringBuilder sb = new StringBuilder();
         
         for(Scope s: scopes) {
-            sb.append(s.getScopeName()).append("\n");
+            sb.append(s.name()).append("\n");
         }
         return sb.toString();
     }

@@ -21,54 +21,69 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * A scope contains all variables of a program part. Scopes are nested and local 
+ * to a procedure call. This enables dynamic scoping. there are occurrences where a
+ * procedure call is evaluated in the scope of it's caller. Those procedures
+ * are called macros. Macro handling is done at interpreter level, the scope
+ * itself is not aware of the procedure call it closes over.
+ * 
+ * A scope is normally named after the procedure it closes over.
+ * 
  * @author uprisesoft@gmail.com
  */
 public class Scope {
 
     private String scopeName = "";
     private Map<String, Node> members = new HashMap<>();
-    
-    private Node code = Node.nil();
 
     public Scope(String scopeName) {
         this.scopeName = scopeName;
     }
-    
-    public Scope(Call code, String scopeName) {
-        this.code = code;
-        this.scopeName = scopeName;
-    }
 
-    public String getScopeName() {
+    public String name() {
         return scopeName;
     }
 
-    public Node getCode() {
-        return code;
-    }
-    
-    protected Map<String, Node> members() {
-        return members;
-    }
-
-    public Node resolve(String name) {
+    /**
+     * Gets the value defined with this name. In yali code this is equivalent to
+     * thing "name or :name. Always check with thingable() first if the variable 
+     * is defined. 
+     * @param name the name of the variable
+     * @return the value defined with the variable name
+     */
+    public Node thing(String name) {
         if (members.containsKey(name.toLowerCase())) {
             return members.get(name.toLowerCase());
         } 
 
+        // Shouldn't happen
         return Node.none();
     }
 
-    public void define(String name, Node value) {
+    /**
+     * Bind a variable name to a value in this scope.
+     * @param name the name of the variable
+     * @param value the value of the variable
+     */
+    public void make(String name, Node value) {
         members.put(name.toLowerCase(), value);
     }
 
+    /**
+     * Reserve a variable name in this scope. This ensures that the variable isn't 
+     * defined in a higher scope.
+     * @param name the name of the variable
+     */
     public void local(String name) {
         members.put(name.toLowerCase(), Node.none());
     }
 
-    public boolean defined(String name) {
+    /**
+     * Check if a variable is defined in this scope.
+     * @param name the variable name to check
+     * @return true if defined, false otherwise
+     */
+    public boolean thingable(String name) {
         return members.containsKey(name);
     }
 

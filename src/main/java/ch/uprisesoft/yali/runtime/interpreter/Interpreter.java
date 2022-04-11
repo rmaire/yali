@@ -380,7 +380,7 @@ public class Interpreter implements OutputObserver {
         Call call = stack.pop();
 
         if (!call.definition().isMacro()) {
-            tracers.forEach(t -> t.unscope(env.peek().getScopeName(), env));
+            tracers.forEach(t -> t.unscope(env.peek().name(), env));
             env.pop();
         }
         lastResult = call.result();
@@ -400,7 +400,7 @@ public class Interpreter implements OutputObserver {
         stack.push(call);
         if (!call.definition().isMacro()) {
             env.push(new Scope(call.getName()));
-            tracers.forEach(t -> t.scope(env.peek().getScopeName(), env));
+            tracers.forEach(t -> t.scope(env.peek().name(), env));
         }
     }
 

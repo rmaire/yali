@@ -62,17 +62,17 @@ public class PrintingTracer implements Tracer {
 
     @Override
     public void make(String name, Node val, Environment env) {
-        System.out.println(lpad() + "Defining Variable " + name + " in scope " + env.peek().getScopeName() + " with value " + val.toString());
+        System.out.println(lpad() + "Defining Variable " + name + " in scope " + env.peek().name() + " with value " + val.toString());
     }
 
     @Override
     public void thing(String name, Node val, Environment env) {
-        System.out.println(lpad() + "Resolving Variable " + name + " in scope " + env.peek().getScopeName() + " with value " + val.toString());
+        System.out.println(lpad() + "Resolving Variable " + name + " in scope " + env.peek().name() + " with value " + val.toString());
     }
 
     @Override
     public void local(String name, Environment env) {
-        System.out.println(lpad() + "Local Variable " + name + " in scope " + env.peek().getScopeName());
+        System.out.println(lpad() + "Local Variable " + name + " in scope " + env.peek().name());
     }
 
     @Override
