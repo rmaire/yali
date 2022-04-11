@@ -248,12 +248,12 @@ public class Interpreter implements OutputObserver {
      * it moves the first Call from the program list to the execution stack. If
      * there is a call on the stack, it checks if it's already evaluated. If yes,
      * it is unscheduled from the stack, the result is bubbled up and the returns.
-     * If no, it first check if htere are more arguments to evaluate. If yes, it
+     * If no, it first check if there are more arguments to evaluate. If yes, it
      * schedules the next one and returns. If no, the environment of the call is
      * loaded with the arguments and continues to procedure evaluation.
      * Evaluation differs for native calls and user defined calls. Native calls
      * are handled with the BiFunctions defined in call definition, user defined
-     * calls have their
+     * calls have their children evaluated instead.
      * 
      * @return true if there is more to do and tick() can be called once more, false otherwise.
      */
