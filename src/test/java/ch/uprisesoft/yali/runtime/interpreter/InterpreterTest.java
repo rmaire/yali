@@ -56,7 +56,7 @@ public class InterpreterTest {
 
             @Override
             public void inform(String output) {
-//                System.out.println(output);
+                System.out.println(output);
                 outputs.add(output);
             }
         };
@@ -141,7 +141,7 @@ public class InterpreterTest {
     }
     
     @Test
-    public void testRecursion2() {
+    public void testRecursion() {
         String input = "to recurse :i\n"
                 + "print :i\n"
                 + "if (:i > 0) [recurse :i - 1]\n"
@@ -158,6 +158,26 @@ public class InterpreterTest {
         }        
     }
     
+    @Disabled
+    @Test
+    public void testRecursion2() {
+        String input = "to square\n"
+                + "repeat 4 [fd 100 rt 90]\n"
+                + "end\n"
+                + "\n"
+                + "to draw\n"
+                + "square\n"
+                + "fd 5\n"
+                + "rt 7\n"
+                + "print turtlepos\n"
+                + "draw\n"
+                + "end\n"
+                + "\n"
+                + "draw\n";
+
+        Node res = it.run(it.read(input));       
+    }
+    
     @Test
     public void testNestedRunList() {
         String input = "to testit :i\n"
@@ -172,5 +192,4 @@ public class InterpreterTest {
         assertThat(outputs.get(0), is("first\n"));
         assertThat(outputs.get(1), is("yes\n"));
     }
-
 }
