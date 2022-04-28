@@ -76,7 +76,7 @@ public class Interpreter implements OutputObserver {
      */
     public Node run(Node node) {
         tracers.forEach(t -> t.run(node));
-
+        
         if (!node.type().equals(NodeType.LIST)) {
             throw new NodeTypeException(node, node.type(), NodeType.LIST);
         }
@@ -87,6 +87,11 @@ public class Interpreter implements OutputObserver {
         }
 
         return run();
+    }
+    
+    public void reset() {
+        saveProgram.clear();
+        saveStack.clear();
     }
 
     /**

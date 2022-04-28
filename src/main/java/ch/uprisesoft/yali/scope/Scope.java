@@ -16,7 +16,6 @@
 package ch.uprisesoft.yali.scope;
 
 import ch.uprisesoft.yali.ast.node.Node;
-import ch.uprisesoft.yali.ast.node.Call;
 import java.util.HashMap;
 import java.util.Map;
 
