@@ -89,11 +89,6 @@ public class Interpreter implements OutputObserver {
 
         return run();
     }
-    
-    public void reset() {
-        saveProgram.clear();
-        saveStack.clear();
-    }
 
     /**
      * Runs a single procedure calls
