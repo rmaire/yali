@@ -21,7 +21,10 @@ import ch.uprisesoft.yali.scope.Environment;
 import java.util.List;
 
 /**
- *
+ * Use a Tracer if you want to see what's happening while interpreting a yali
+ * AST. In every relevant action in the Interpreter, the registered Tracer
+ * methods are called. This can be used to build e.g. stack tracers or debuggers.
+ * 
  * @author uprisesoft@gmail.com
  */
 public interface Tracer {

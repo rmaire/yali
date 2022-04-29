@@ -70,7 +70,8 @@ public class Interpreter implements OutputObserver {
 
     /**
      * Runs a list of procedure calls
-     * @param A node which is expected to be of list type. All children will be 
+     *
+     * @param A node which is expected to be of list type. All children will be
      * run first-to-last
      * @return Returns the last evaluated result
      */
@@ -96,6 +97,7 @@ public class Interpreter implements OutputObserver {
 
     /**
      * Runs a single procedure calls
+     *
      * @param A valid call object
      * @return Returns the last evaluated result
      */
@@ -109,6 +111,7 @@ public class Interpreter implements OutputObserver {
 
     /**
      * Runs a previously preloaded interpreter. Can be loaded with load()
+     *
      * @return Returns the last evaluated result
      */
     public Node run() {
@@ -118,13 +121,21 @@ public class Interpreter implements OutputObserver {
         return lastResult;
     }
 
+    public void reset() {
+        program.clear();;
+        stack.clear();
+        saveProgram.clear();
+        saveStack.clear();
+    }
+
     /**
-     * Loads a list of procedure calls or other nodes into the interpreter for 
-     * further evaluation. Only lists or calls are scheduled for evaluation. The 
-     * value of a reference is stored in the last result, every other type is 
+     * Loads a list of procedure calls or other nodes into the interpreter for
+     * further evaluation. Only lists or calls are scheduled for evaluation. The
+     * value of a reference is stored in the last result, every other type is
      * stored directly in the last result.
-     * @param  A node which is expected to be of list type.
-     */    
+     *
+     * @param A node which is expected to be of list type.
+     */
     public void load(Node node) {
         tracers.forEach(t -> t.load(node));
 
@@ -150,7 +161,6 @@ public class Interpreter implements OutputObserver {
 
     @Deprecated
     public Node runBounded(Node node) {
-//        tracers.forEach(t -> t.run(node));
         saveStack();
 
         for (Node n : node.getChildren()) {
@@ -188,6 +198,7 @@ public class Interpreter implements OutputObserver {
 
     /**
      * Resumes evaluation after a pause call.
+     *
      * @return Returns the last evaluated result
      */
     public Node resume() {
@@ -201,8 +212,8 @@ public class Interpreter implements OutputObserver {
     }
 
     /**
-     * Pauses the interpreter. This method is intended to be used by native calls 
-     * only. Use at your own risk. Resume with the resume() Method.
+     * Pauses the interpreter. This method is intended to be used by native
+     * calls only. Use at your own risk. Resume with the resume() Method.
      */
     public void pause() {
         tracers.forEach(t -> t.pause(stack.peek()));
@@ -211,6 +222,7 @@ public class Interpreter implements OutputObserver {
 
     /**
      * Used to check if the interpreter is paused. Useful e.g. for REPLs
+     *
      * @return Pause status of the interpreter. Returns true if paused
      */
     public boolean paused() {
@@ -219,26 +231,32 @@ public class Interpreter implements OutputObserver {
 
     /**
      * Parses an input string to a executable syntax tree
+     *
      * @param Yali source code
-     * @return the parsed syntax tree, top element is always a list of procedure calls
+     * @return the parsed syntax tree, top element is always a list of procedure
+     * calls
      */
     public Node read(String source) {
         return new Parser(this).read(source);
     }
 
     /**
-     * Parses an input list to a executable syntax tree. This is useful e.g. for 
-     * control structures or other constructs which run a list as procedure calls
+     * Parses an input list to a executable syntax tree. This is useful e.g. for
+     * control structures or other constructs which run a list as procedure
+     * calls
+     *
      * @param Yali source code
-     * @return the parsed syntax tree, top element is always a list of procedure calls
+     * @return the parsed syntax tree, top element is always a list of procedure
+     * calls
      */
     public Node read(ch.uprisesoft.yali.ast.node.List list) {
         return new Parser(this).read(list);
     }
 
     /**
-     * Returns the environment at this moment with all defined scopes, procedures 
-     * and variables
+     * Returns the environment at this moment with all defined scopes,
+     * procedures and variables
+     *
      * @return the environment
      */
     public Environment env() {
@@ -246,27 +264,29 @@ public class Interpreter implements OutputObserver {
     }
 
     /**
-     * This is the main worker method of the interpreter.
-     * It does one atomic step per call. The interpreter primarily is a stack 
-     * machine, but because there can be multiple top-level commands scheduled,
-     * there is also a list for all loaded procedure calls. If the stack is empty,
-     * it moves the first Call from the program list to the execution stack. If
-     * there is a call on the stack, it checks if it's already evaluated. If yes,
-     * it is unscheduled from the stack, the result is bubbled up and the returns.
-     * If no, it first check if there are more arguments to evaluate. If yes, it
-     * schedules the next one and returns. If no, the environment of the call is
-     * loaded with the arguments and continues to procedure evaluation.
-     * Evaluation differs for native calls and user defined calls. Native calls
-     * are handled with the BiFunctions defined in call definition, user defined
-     * calls have their children evaluated instead.
-     * 
-     * @return true if there is more to do and tick() can be called once more, false otherwise.
+     * This is the main worker method of the interpreter. It does one atomic
+     * step per call. The interpreter primarily is a stack machine, but because
+     * there can be multiple top-level commands scheduled, there is also a list
+     * for all loaded procedure calls. If the stack is empty, it moves the first
+     * Call from the program list to the execution stack. If there is a call on
+     * the stack, it checks if it's already evaluated. If yes, it is unscheduled
+     * from the stack, the result is bubbled up and then returns. If no, it first
+     * checks if there are more arguments to evaluate. If yes, it schedules the
+     * next one and returns. If no, the environment of the call is loaded with
+     * the arguments and continues to procedure evaluation. Evaluation differs
+     * for native calls and user defined calls. Native calls are handled with
+     * the BiFunctions defined in call definition, user defined calls have their
+     * children evaluated instead.
+     *
+     * @return true if there is more to do and tick() can be called once more,
+     * false otherwise.
      */
     public boolean tick() {
 
         /*
         Global Program state
          */
+        
         if (paused) {
             return false;
         }
@@ -291,6 +311,7 @@ public class Interpreter implements OutputObserver {
         /*
         Result handling
          */
+        
         // Check for finished procedures. A procedure is finished when evaluated()
         // returns true. If stack is 1 and program empty, this
         // is the result. Else, deschedule the call and set the result to the
@@ -314,7 +335,6 @@ public class Interpreter implements OutputObserver {
         /*
         Arguments evaluation
          */
-        
         // Arguments are evaluated first. If a call does not have it's argument
         // evaluated, schedule the next argument to be evaluated
         if (stack.peek().hasMoreParameters()) {
@@ -348,12 +368,12 @@ public class Interpreter implements OutputObserver {
 
         if (call.definition().isNative()) {
             tracers.forEach(t -> t.callPrimitive(call.getName(), call.args(), env));
-            
+
             // With a native call, the first BiFunction is applied. It should 
             // return a result if it's a pure procedure or Node.boolean(true) if
             // there are more steps necessary
             Node result = call.definition().getNativeCall().apply(env.peek(), call.args());
-            
+
             // If hte BiFunction callback for checking for more work returns true,
             // the procedure will stay scheduled. As soon as it returns false, the
             // call is marked as finished and descheduled in the next tick()

@@ -77,6 +77,38 @@ public class InterpreterTest {
         ObjectMother om = new ObjectMother(oo, ig);
         it = om.getInterpreter();
     }
+    
+    @Test
+    public void testExp1() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("fd 60 rt 120 fd 60 rt 120 fd 60 rt 120").append("\n");
+        Node res = it.run(it.read(sb.toString()));
+    }
+    
+    @Test
+    public void testExp2() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("make \"first_programmer \"Ada_Lovelace").append("\n");
+        sb.append("print :first_programmer").append("\n");
+        Node res = it.run(it.read(sb.toString()));
+    }
+    
+    @Test
+    public void testExp3() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("make \"angle 0").append("\n");
+        sb.append("repeat 10 [fd 3 rt :angle make \"angle :angle + 7]").append("\n");
+        Node res = it.run(it.read(sb.toString()));
+    }
+    
+    @Test
+    public void testExp4() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("make \"size 81 / 9").append("\n");
+        sb.append("print 2*3").append("\n");
+        sb.append("print :size - 4").append("\n");
+        Node res = it.run(it.read(sb.toString()));
+    }
 
     @Test
     public void testNestedFunDefAndCall() {
@@ -109,7 +141,7 @@ public class InterpreterTest {
     }
     
     @Test
-    public void testRecursion2() {
+    public void testRecursion() {
         String input = "to recurse :i\n"
                 + "print :i\n"
                 + "if (:i > 0) [recurse :i - 1]\n"
@@ -126,6 +158,26 @@ public class InterpreterTest {
         }        
     }
     
+    @Disabled
+    @Test
+    public void testRecursion2() {
+        String input = "to square\n"
+                + "repeat 4 [fd 100 rt 90]\n"
+                + "end\n"
+                + "\n"
+                + "to draw\n"
+                + "square\n"
+                + "fd 5\n"
+                + "rt 7\n"
+                + "print turtlepos\n"
+                + "draw\n"
+                + "end\n"
+                + "\n"
+                + "draw\n";
+
+        Node res = it.run(it.read(input));       
+    }
+    
     @Test
     public void testNestedRunList() {
         String input = "to testit :i\n"
@@ -140,5 +192,4 @@ public class InterpreterTest {
         assertThat(outputs.get(0), is("first\n"));
         assertThat(outputs.get(1), is("yes\n"));
     }
-
 }
