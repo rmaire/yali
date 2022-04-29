@@ -56,7 +56,7 @@ public class InterpreterTest {
 
             @Override
             public void inform(String output) {
-                System.out.println(output);
+//                System.out.println(output);
                 outputs.add(output);
             }
         };

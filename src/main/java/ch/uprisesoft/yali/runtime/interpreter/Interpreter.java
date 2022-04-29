@@ -112,6 +112,13 @@ public class Interpreter implements OutputObserver {
 
         return lastResult;
     }
+    
+    public void reset() {
+        program.clear();;
+        stack.clear();
+        saveProgram.clear();
+        saveStack.clear();
+    }
 
     /**
      * Loads a list of procedure calls or other nodes into the interpreter for 

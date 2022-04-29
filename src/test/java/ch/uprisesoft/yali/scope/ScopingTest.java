@@ -157,7 +157,7 @@ public class ScopingTest {
         try {
             Node res = it.run(it.read(sb.toString()));
         } catch (NodeTypeException nte) {
-            System.out.println(nte.getNode().token().toString());
+//            System.out.println(nte.getNode().token().toString());
         }
 
         assertThat(it.env().thingable("testvar"), is(true));
