@@ -58,12 +58,8 @@ public class Main {
         MockTurtleManager mtm = new MockTurtleManager();
         mtm.registerProcedures(it);
         
-        Node result = it.run(it.read("filter [notequal? ? \"b] \"abcd"));
-        System.out.println(result);
-//        System.out.println(it.env().thing("__last_map_result__"));
-        
-//        Repl repl = new Repl();
-//        repl.runPrompt();
+        Repl repl = new Repl();
+        repl.runPrompt();
 
     }
 }

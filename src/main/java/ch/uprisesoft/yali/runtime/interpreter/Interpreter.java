@@ -48,11 +48,6 @@ public class Interpreter implements OutputObserver {
     private java.util.Stack<Call> stack = new java.util.Stack<>();
     private java.util.List<Call> program = new ArrayList<>();
 
-    // Bounded execution
-    private boolean bounded;
-    private java.util.Stack<Call> saveStack = stack;
-    private java.util.List<Call> saveProgram = program;
-
     private Node lastResult;
 
     public Interpreter() {
@@ -119,8 +114,6 @@ public class Interpreter implements OutputObserver {
     public void reset() {
         program.clear();;
         stack.clear();
-        saveProgram.clear();
-        saveStack.clear();
     }
 
     /**
@@ -152,43 +145,6 @@ public class Interpreter implements OutputObserver {
                 lastResult = node;
                 break;
         }
-    }
-
-    @Deprecated
-    public Node runBounded(Node node) {
-        saveStack();
-
-        for (Node n : node.getChildren()) {
-            Call call = n.toProcedureCall();
-            program.add(call);
-        }
-
-        while (tick()) {
-        }
-
-        if (!paused) {
-            restoreStack();
-        }
-
-        return lastResult;
-    }
-
-    @Deprecated
-    private void saveStack() {
-        bounded = true;
-        saveStack = stack;
-        saveProgram = program;
-
-        stack = new java.util.Stack<>();
-        program = new java.util.ArrayList<>();
-        bounded = false;
-    }
-
-    @Deprecated
-    private void restoreStack() {
-        stack = saveStack;
-        program = saveProgram;
-        bounded = false;
     }
 
     /**
@@ -295,11 +251,6 @@ public class Interpreter implements OutputObserver {
             // If both program and stack are empty, execution is finished or no
             // program was loaded in the first place
             if (program.isEmpty()) {
-
-                if (bounded) {
-                    restoreStack();
-                    return true;
-                }
                 return false;
             } else {
                 schedule(program.remove(0));

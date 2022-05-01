@@ -135,17 +135,17 @@ public class TemplateTest {
         assertThat(result.toQuotedWord().getQuote(), is("acd"));
     }
     
-    @Test
-    public void testFind() {
-        Node result = it.run(it.read("find [equal? ? 2] [1 2 3 4]"));
-        
-        assertThat(result.toSymbolWord().getSymbol(), is("2"));
-    }
+//    @Test
+//    public void testFind() {
+//        Node result = it.run(it.read("find [equal? ? 2] [1 2 3 4]"));
+//        
+//        assertThat(result.toSymbolWord().getSymbol(), is("2"));
+//    }
     
-    @Test
-    public void testFindWord() {
-        Node result = it.run(it.read("find [equal? ? \"b] \"abcd"));
-        
-        assertThat(result.toQuotedWord().getQuote(), is("b"));
-    }
+//    @Test
+//    public void testFindWord() {
+//        Node result = it.run(it.read("find [equal? ? \"b] \"abcd"));
+//        
+//        assertThat(result.toQuotedWord().getQuote(), is("b"));
+//    }
 }
