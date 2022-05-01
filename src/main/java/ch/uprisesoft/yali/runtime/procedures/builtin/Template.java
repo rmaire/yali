@@ -35,8 +35,7 @@ public class Template implements ProcedureProvider {
 
     private Interpreter it;
 
-    // TODO
-    private Node template = Node.none();
+    private Node mapTemplate = Node.none();
     private java.util.List<Node> mapResults = new ArrayList<>();
     private java.util.List<Node> mapValues = new ArrayList<>();
     private boolean mapIsList = false;
@@ -51,12 +50,12 @@ public class Template implements ProcedureProvider {
 
         if (mapRunning && mapValues.isEmpty()) {
             mapRunning = false;
-            return returnMapResult();
+            return mapResult();
         }
 
         if (!mapRunning) {
             if (args.get(0).type().equals(NodeType.LIST)) {
-                template = args.get(0).toList();
+                mapTemplate = args.get(0).toList();
             } else {
                 throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.LIST);
             }
@@ -78,7 +77,7 @@ public class Template implements ProcedureProvider {
 
         Node val = mapValues.remove(0);
         java.util.List<Node> realizedValues = new ArrayList<>();
-        for (Node n : template.getChildren()) {
+        for (Node n : mapTemplate.getChildren()) {
             if (n.type().equals(NodeType.SYMBOL) && n.toSymbolWord().getSymbol().equals("?")) {
                 realizedValues.add(val);
             } else {
@@ -90,20 +89,20 @@ public class Template implements ProcedureProvider {
         Call c = it.read("make \"__last_map_result__ " + realizedString).getChildren().get(0).toProcedureCall();
         it.schedule(c);
 
-        return returnMapResult();
+        return mapResult();
     }
 
     public Node mapFinished(Scope scope, Node result) {
         if (!mapRunning) {
             mapResults.clear();
-            template = Node.none();
+            mapTemplate = Node.none();
             mapValues = new ArrayList<>();
             return Node.bool(false);
         }
         return Node.bool(true);
     }
 
-    private Node returnMapResult() {
+    private Node mapResult() {
         if (mapIsList) {
             return Node.list(mapResults);
         } else {
@@ -117,82 +116,166 @@ public class Template implements ProcedureProvider {
         }
     }
 
-    // TODO
+    private Node filterTemplate = Node.none();
+    private java.util.List<Node> filterResults = new ArrayList<>();
+    private java.util.List<Node> filterValues = new ArrayList<>();
+    private boolean filterIsList = false;
+    private boolean filterRunning = false;
+
     public Node filter(Scope scope, java.util.List<Node> args) {
-
-        Node template = Node.none();
-
-        if (args.get(0).type().equals(NodeType.LIST)) {
-            template = args.get(0).toList();
-        } else {
-            throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.LIST);
+        if (scope.thingable("__last_filter_result__")) {
+            Node res = scope.thing("__last_filter_result__");
+            if (res.type().equals(NodeType.BOOLEAN) && res.toBooleanWord().getBoolean() == true) {
+                filterResults.add(filterValues.get(0));
+            }
+            filterValues.remove(0);
+            scope.unmake("__last_filter_result__");
         }
 
-        if (args.get(1).type().equals(NodeType.LIST)) {
-            Node values = args.get(1).toList();
+        if (filterRunning && filterValues.isEmpty()) {
+            filterRunning = false;
+            return filterResult();
+        }
 
-            java.util.List<Node> results = new ArrayList<>();
-
-            for (int i = 0; i < values.getChildren().size(); i++) {
-                Node val = values.getChildren().get(i);
-                java.util.List<Node> realizedValues = new ArrayList<>();
-                for (Node n : template.getChildren()) {
-                    if (n.type().equals(NodeType.SYMBOL) && n.toSymbolWord().getSymbol().equals("?")) {
-                        realizedValues.add(val);
-                    } else {
-                        realizedValues.add(n);
-                    }
-                }
-
-                List l = new List(realizedValues);
-                String runCommand = l.toString().substring(1, l.toString().length() - 1);
-                Node result = it.runBounded(it.read(runCommand));
-
-                if (!result.type().equals(NodeType.BOOLEAN)) {
-                    throw new NodeTypeException(template, result.type(), NodeType.BOOLEAN);
-                }
-
-                if (result.toBooleanWord().getBoolean()) {
-                    results.add(val);
-                }
+        if (!filterRunning) {
+            if (args.get(0).type().equals(NodeType.LIST)) {
+                filterTemplate = args.get(0).toList();
+            } else {
+                throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.LIST);
             }
-            return new List(results);
 
-        } else if (args.get(1).type().equals(NodeType.QUOTE)) {
-            String values = args.get(1).toQuotedWord().getQuote();
-
-            String results = "";
-
-            for (int i = 0; i < values.length(); i++) {
-                Character val = values.charAt(i);
-                java.util.List<Node> realizedValues = new ArrayList<>();
-                for (Node n : template.getChildren()) {
-                    if (n.type().equals(NodeType.SYMBOL) && n.toSymbolWord().getSymbol().equals("?")) {
-                        realizedValues.add(Node.symbol("\"" + String.valueOf(val)));
-                    } else {
-                        realizedValues.add(n);
-                    }
+            if (args.get(1).type().equals(NodeType.LIST)) {
+                filterValues = args.get(1).toList().getChildren();
+                filterIsList = true;
+            } else if (args.get(1).type().equals(NodeType.QUOTE)) {
+                String valueChars = args.get(1).toQuotedWord().getQuote();
+                for (int i = 0; i < valueChars.length(); i++) {
+                    filterValues.add(Node.symbol(String.valueOf(valueChars.charAt(i))));
                 }
-
-                List l = new List(realizedValues);
-                String runCommand = l.toString().substring(1, l.toString().length() - 1);
-                Node result = it.runBounded(it.read(runCommand));
-
-                if (!result.type().equals(NodeType.BOOLEAN)) {
-                    throw new NodeTypeException(template, result.type(), NodeType.BOOLEAN);
-                }
-
-                if (result.toBooleanWord().getBoolean()) {
-                    results += val;
-                }
+                filterIsList = false;
+            } else {
+                throw new NodeTypeException(args.get(1), args.get(1).type(), NodeType.LIST, NodeType.QUOTE);
             }
-            return new QuotedWord(results);
+            filterRunning = true;
+        }
 
+        Node val = filterValues.get(0);
+        java.util.List<Node> realizedValues = new ArrayList<>();
+        for (Node n : filterTemplate.getChildren()) {
+            if (n.type().equals(NodeType.SYMBOL) && n.toSymbolWord().getSymbol().equals("?")) {
+                realizedValues.add(val);
+            } else {
+                realizedValues.add(n);
+            }
+        }
+
+        String realizedString = Node.list(realizedValues).toString().substring(1, Node.list(realizedValues).toString().length() - 1);
+        Call c = it.read("make \"__last_filter_result__ " + realizedString).getChildren().get(0).toProcedureCall();
+        System.out.println(c);
+        it.schedule(c);
+
+        return filterResult();
+    }
+
+    public Node filterFinished(Scope scope, Node result) {
+        if (!filterRunning) {
+            filterResults.clear();
+            filterTemplate = Node.none();
+            filterValues = new ArrayList<>();
+            return Node.bool(false);
+        }
+        return Node.bool(true);
+    }
+
+    private Node filterResult() {
+        if (filterIsList) {
+            return Node.list(filterResults);
         } else {
-            throw new NodeTypeException(args.get(1), args.get(1).type(), NodeType.LIST, NodeType.QUOTE);
+            StringBuilder result = new StringBuilder();
+
+            for (Node r : filterResults) {
+                result.append(r.toString());
+            }
+            it.output(Node.quote(result.toString()));
+            return Node.quote(result.toString());
         }
     }
 
+    // TODO
+//    public Node filter(Scope scope, java.util.List<Node> args) {
+//
+//        Node template = Node.none();
+//
+//        if (args.get(0).type().equals(NodeType.LIST)) {
+//            template = args.get(0).toList();
+//        } else {
+//            throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.LIST);
+//        }
+//
+//        if (args.get(1).type().equals(NodeType.LIST)) {
+//            Node values = args.get(1).toList();
+//
+//            java.util.List<Node> results = new ArrayList<>();
+//
+//            for (int i = 0; i < values.getChildren().size(); i++) {
+//                Node val = values.getChildren().get(i);
+//                java.util.List<Node> realizedValues = new ArrayList<>();
+//                for (Node n : template.getChildren()) {
+//                    if (n.type().equals(NodeType.SYMBOL) && n.toSymbolWord().getSymbol().equals("?")) {
+//                        realizedValues.add(val);
+//                    } else {
+//                        realizedValues.add(n);
+//                    }
+//                }
+//
+//                List l = new List(realizedValues);
+//                String runCommand = l.toString().substring(1, l.toString().length() - 1);
+//                Node result = it.runBounded(it.read(runCommand));
+//
+//                if (!result.type().equals(NodeType.BOOLEAN)) {
+//                    throw new NodeTypeException(template, result.type(), NodeType.BOOLEAN);
+//                }
+//
+//                if (result.toBooleanWord().getBoolean()) {
+//                    results.add(val);
+//                }
+//            }
+//            return new List(results);
+//
+//        } else if (args.get(1).type().equals(NodeType.QUOTE)) {
+//            String values = args.get(1).toQuotedWord().getQuote();
+//
+//            String results = "";
+//
+//            for (int i = 0; i < values.length(); i++) {
+//                Character val = values.charAt(i);
+//                java.util.List<Node> realizedValues = new ArrayList<>();
+//                for (Node n : template.getChildren()) {
+//                    if (n.type().equals(NodeType.SYMBOL) && n.toSymbolWord().getSymbol().equals("?")) {
+//                        realizedValues.add(Node.symbol("\"" + String.valueOf(val)));
+//                    } else {
+//                        realizedValues.add(n);
+//                    }
+//                }
+//
+//                List l = new List(realizedValues);
+//                String runCommand = l.toString().substring(1, l.toString().length() - 1);
+//                Node result = it.runBounded(it.read(runCommand));
+//
+//                if (!result.type().equals(NodeType.BOOLEAN)) {
+//                    throw new NodeTypeException(template, result.type(), NodeType.BOOLEAN);
+//                }
+//
+//                if (result.toBooleanWord().getBoolean()) {
+//                    results += val;
+//                }
+//            }
+//            return new QuotedWord(results);
+//
+//        } else {
+//            throw new NodeTypeException(args.get(1), args.get(1).type(), NodeType.LIST, NodeType.QUOTE);
+//        }
+//    }
     // TODO
     public Node find(Scope scope, java.util.List<Node> args) {
         Node template = Node.none();
@@ -267,7 +350,7 @@ public class Template implements ProcedureProvider {
         this.it = interpreter;
 
         it.env().define(new Procedure("map", (scope, val) -> this.map(scope, val), (scope, val) -> this.mapFinished(scope, val), "__template__", "__values__").macro());
-        it.env().define(new Procedure("filter", (scope, val) -> this.filter(scope, val), (scope, val) -> Node.none(), "__template__", "__values__"));
+        it.env().define(new Procedure("filter", (scope, val) -> this.filter(scope, val), (scope, val) -> this.filterFinished(scope, val), "__template__", "__values__").macro());
         it.env().define(new Procedure("find", (scope, val) -> this.find(scope, val), (scope, val) -> Node.none(), "__template__", "__values__"));
 
         return it;

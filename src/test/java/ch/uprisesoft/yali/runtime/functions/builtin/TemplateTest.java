@@ -129,7 +129,7 @@ public class TemplateTest {
     
     @Test
     public void testFilterQuote() {
-        Node result = it.run(it.read("filter [notequal? ? \"b] \"abcd"));
+        Node result = it.run(it.read("filter [notequal? ? b] \"abcd"));
         
         assertThat(result.type(), is(NodeType.QUOTE));
         assertThat(result.toQuotedWord().getQuote(), is("acd"));
