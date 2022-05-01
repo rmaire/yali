@@ -15,6 +15,7 @@
  */
 package ch.uprisesoft.yali.main;
 
+import ch.uprisesoft.yali.ast.node.Node;
 import ch.uprisesoft.yali.repl.Repl;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
 import ch.uprisesoft.yali.runtime.io.InputGenerator;
@@ -57,8 +58,12 @@ public class Main {
         MockTurtleManager mtm = new MockTurtleManager();
         mtm.registerProcedures(it);
         
-        Repl repl = new Repl();
-        repl.runPrompt();
+        Node result = it.run(it.read("map [uppercase ?] \"abcd"));
+        System.out.println(result.toQuotedWord());
+//        System.out.println(it.env().thing("__last_map_result__"));
+        
+//        Repl repl = new Repl();
+//        repl.runPrompt();
 
     }
 }

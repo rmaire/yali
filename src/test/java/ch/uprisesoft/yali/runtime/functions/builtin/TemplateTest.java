@@ -85,12 +85,12 @@ public class TemplateTest {
         Node result = it.run(it.read("map [? * ?] [1 2 3]"));
         
         assertThat(result.getChildren().size(), is(3));
-        assertThat(result.getChildren().get(0).type(), is(NodeType.SYMBOL));
-        assertThat(result.getChildren().get(0).toSymbolWord().getSymbol(), is("1"));
-        assertThat(result.getChildren().get(1).type(), is(NodeType.SYMBOL));
-        assertThat(result.getChildren().get(1).toSymbolWord().getSymbol(), is("4"));
-        assertThat(result.getChildren().get(2).type(), is(NodeType.SYMBOL));
-        assertThat(result.getChildren().get(2).toSymbolWord().getSymbol(), is("9"));
+        assertThat(result.getChildren().get(0).type(), is(NodeType.INTEGER));
+        assertThat(result.getChildren().get(0).toIntegerWord().getInteger(), is(1));
+        assertThat(result.getChildren().get(1).type(), is(NodeType.INTEGER));
+        assertThat(result.getChildren().get(1).toIntegerWord().getInteger(), is(4));
+        assertThat(result.getChildren().get(2).type(), is(NodeType.INTEGER));
+        assertThat(result.getChildren().get(2).toIntegerWord().getInteger(), is(9));
     }
     
     @Test
@@ -98,22 +98,22 @@ public class TemplateTest {
         Node result = it.run(it.read("map [equal? (mod ? 2) 1] [1 2 3 4]"));
         
         assertThat(result.getChildren().size(), is(4));
-        assertThat(result.getChildren().get(0).type(), is(NodeType.SYMBOL));
-        assertThat(result.getChildren().get(0).toSymbolWord().getSymbol(), is("true"));
-        assertThat(result.getChildren().get(1).type(), is(NodeType.SYMBOL));
-        assertThat(result.getChildren().get(1).toSymbolWord().getSymbol(), is("false"));
-        assertThat(result.getChildren().get(2).type(), is(NodeType.SYMBOL));
-        assertThat(result.getChildren().get(2).toSymbolWord().getSymbol(), is("true"));
-        assertThat(result.getChildren().get(3).type(), is(NodeType.SYMBOL));
-        assertThat(result.getChildren().get(3).toSymbolWord().getSymbol(), is("false"));
+        assertThat(result.getChildren().get(0).type(), is(NodeType.BOOLEAN));
+        assertThat(result.getChildren().get(0).toBooleanWord().getBoolean(), is(true));
+        assertThat(result.getChildren().get(1).type(), is(NodeType.BOOLEAN));
+        assertThat(result.getChildren().get(1).toBooleanWord().getBoolean(), is(false));
+        assertThat(result.getChildren().get(2).type(), is(NodeType.BOOLEAN));
+        assertThat(result.getChildren().get(2).toBooleanWord().getBoolean(), is(true));
+        assertThat(result.getChildren().get(3).type(), is(NodeType.BOOLEAN));
+        assertThat(result.getChildren().get(3).toBooleanWord().getBoolean(), is(false));
     }
     
      @Test
     public void testMapQuote() {
         Node result = it.run(it.read("map [uppercase ?] \"abcd"));
         
-        assertThat(result.type(), is(NodeType.SYMBOL));
-        assertThat(result.toSymbolWord().getSymbol(), is("ABCD"));
+        assertThat(result.type(), is(NodeType.QUOTE));
+        assertThat(result.toQuotedWord().getQuote(), is("ABCD"));
     }
     
     @Test

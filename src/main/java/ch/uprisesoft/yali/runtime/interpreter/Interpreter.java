@@ -129,7 +129,7 @@ public class Interpreter implements OutputObserver {
      * value of a reference is stored in the last result, every other type is
      * stored directly in the last result.
      *
-     * @param A node which is expected to be of list type.
+     * @param node A node which is expected to be of list type.
      */
     public void load(Node node) {
         tracers.forEach(t -> t.load(node));
@@ -257,6 +257,10 @@ public class Interpreter implements OutputObserver {
     public Environment env() {
         return env;
     }
+    
+    public void output(Node node) {
+        lastResult = node;
+    }
 
     /**
      * This is the main worker method of the interpreter. It does one atomic
@@ -369,7 +373,7 @@ public class Interpreter implements OutputObserver {
             // there are more steps necessary
             Node result = call.definition().getNativeCall().apply(env.peek(), call.args());
 
-            // If hte BiFunction callback for checking for more work returns true,
+            // If the BiFunction callback for checking for more work returns true,
             // the procedure will stay scheduled. As soon as it returns false, the
             // call is marked as finished and descheduled in the next tick()
             if (!nodeIsTrue(call.definition().getHasMoreCallback().apply(env.peek(), result))) {

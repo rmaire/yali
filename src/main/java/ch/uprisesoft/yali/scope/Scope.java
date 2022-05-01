@@ -67,6 +67,10 @@ public class Scope {
     public void make(String name, Node value) {
         members.put(name.toLowerCase(), value);
     }
+    
+    public void unmake(String name) {
+        members.remove(name.toLowerCase());
+    }
 
     /**
      * Reserve a variable name in this scope. This ensures that the variable isn't 
