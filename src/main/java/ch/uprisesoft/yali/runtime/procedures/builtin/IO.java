@@ -47,7 +47,7 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
         for(Node arg: args) {
             switch (arg.type()) {
                 case SYMBOL:
-                    throw new NodeTypeException(arg, NodeType.SYMBOL, NodeType.BOOLEAN, NodeType.EXPRESSION, NodeType.FLOAT, NodeType.PROCCALL, NodeType.INTEGER, NodeType.LIST, NodeType.NIL, NodeType.QUOTE, NodeType.REFERENCE);
+                    throw new NodeTypeException(arg, NodeType.SYMBOL, NodeType.BOOLEAN, NodeType.FLOAT, NodeType.PROCCALL, NodeType.INTEGER, NodeType.LIST, NodeType.NIL, NodeType.QUOTE, NodeType.REFERENCE);
                 case PROCCALL:
                 case REFERENCE:
                     concreteArgs.add(arg);
