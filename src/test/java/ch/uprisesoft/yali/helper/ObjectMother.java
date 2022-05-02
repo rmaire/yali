@@ -37,7 +37,7 @@ public class ObjectMother {
         this.i = new Interpreter();
         this.p = new Parser(i);
         this.l = new Lexer();
-        this.i.loadStdLib(o);
+        this.i.loadStdLib();
         
         MockTurtleManager mtm = new MockTurtleManager();
         mtm.registerProcedures(i);

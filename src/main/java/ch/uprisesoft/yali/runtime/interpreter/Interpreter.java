@@ -379,7 +379,7 @@ public class Interpreter implements OutputObserver {
         }
     }
 
-    public Interpreter loadStdLib(OutputObserver oo) {
+    public Interpreter loadStdLib() {
 
         Logic logic = new Logic();
         logic.registerProcedures(this);
@@ -405,7 +405,7 @@ public class Interpreter implements OutputObserver {
         com.register(ig);
         com.registerProcedures(this);
 
-        return loadStdLib(oo);
+        return loadStdLib();
     }
 
     public java.util.List<String> stringify(java.util.List<Node> args) {
