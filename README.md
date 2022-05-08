@@ -10,7 +10,7 @@ mvn package
 mvn -Pgithub deploy
 ```
 
-# Quickstart
+# Embedding
 ## Maven
 
 Add to pom.xml:
