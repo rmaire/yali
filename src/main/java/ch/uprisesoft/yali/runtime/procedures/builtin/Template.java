@@ -17,11 +17,9 @@ package ch.uprisesoft.yali.runtime.procedures.builtin;
 
 import ch.uprisesoft.yali.ast.node.Call;
 import ch.uprisesoft.yali.ast.node.Procedure;
-import ch.uprisesoft.yali.ast.node.List;
 import ch.uprisesoft.yali.ast.node.Node;
 import ch.uprisesoft.yali.exception.NodeTypeException;
 import ch.uprisesoft.yali.ast.node.NodeType;
-import ch.uprisesoft.yali.ast.node.word.QuotedWord;
 import ch.uprisesoft.yali.scope.Scope;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
 import java.util.ArrayList;

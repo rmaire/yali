@@ -17,7 +17,7 @@ package ch.uprisesoft.yali.repl;
 
 import ch.uprisesoft.yali.ast.node.Call;
 import ch.uprisesoft.yali.ast.node.Node;
-import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
+import ch.uprisesoft.yali.runtime.interpreter.UnthreadedInterpreter;
 import ch.uprisesoft.yali.runtime.interpreter.Tracer;
 import ch.uprisesoft.yali.scope.Environment;
 import java.util.Collections;
@@ -29,21 +29,10 @@ import java.util.List;
  */
 public class PrintingTracer implements Tracer {
     
-    private final Interpreter it;
+    private final UnthreadedInterpreter it;
 
-    public PrintingTracer(Interpreter it) {
+    public PrintingTracer(UnthreadedInterpreter it) {
         this.it = it;
-    }
-
-    @Override
-    public void parse(String source) {
-//        System.out.println("Parsing. Source: " + source);
-//        System.out.println(source);
-    }
-
-    @Override
-    public void start(Node node) {
-//        System.out.println("Start interpreting.");
     }
 
     @Override
@@ -83,11 +72,6 @@ public class PrintingTracer implements Tracer {
     @Override
     public void tick(Node val) {
         System.out.println(lpad() + "tick: " + val.toString());
-    }
-
-    @Override
-    public void apply(Node val) {
-//        System.out.println("apply: " + val.toString());
     }
 
     @Override
@@ -138,10 +122,4 @@ public class PrintingTracer implements Tracer {
         String lpad = String.join("", Collections.nCopies(it.env().size(), ">")) + " ";
         return lpad;        
     }
-
-    @Override
-    public void returnTick(Node val, String pos) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
 }

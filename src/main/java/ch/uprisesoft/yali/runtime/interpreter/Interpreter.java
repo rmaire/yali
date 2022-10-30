@@ -1,120 +1,36 @@
-/* 
- * Copyright 2020 Uprise Software.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
 package ch.uprisesoft.yali.runtime.interpreter;
 
 import ch.uprisesoft.yali.ast.node.Call;
+import ch.uprisesoft.yali.ast.node.List;
 import ch.uprisesoft.yali.ast.node.Node;
-import ch.uprisesoft.yali.exception.NodeTypeException;
-import ch.uprisesoft.yali.ast.node.NodeType;
-import ch.uprisesoft.yali.parser.Parser;
 import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
-import ch.uprisesoft.yali.runtime.procedures.FunctionNotFoundException;
-import ch.uprisesoft.yali.runtime.procedures.builtin.Arithmetic;
-import ch.uprisesoft.yali.runtime.procedures.builtin.Control;
-import ch.uprisesoft.yali.runtime.procedures.builtin.Data;
-import ch.uprisesoft.yali.runtime.procedures.builtin.IO;
-import ch.uprisesoft.yali.runtime.procedures.builtin.Logic;
-import ch.uprisesoft.yali.runtime.procedures.builtin.Template;
 import ch.uprisesoft.yali.scope.Environment;
-import ch.uprisesoft.yali.scope.Scope;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
- * @author uprisesoft@gmail.com
+ * @author roman
  */
-public class Interpreter implements OutputObserver {
+public interface Interpreter extends OutputObserver {
 
-    private List<Tracer> tracers = new ArrayList<>();
-
-    private Environment env = new Environment();
-    private boolean paused = false;
-
-    private java.util.Stack<Call> stack = new java.util.Stack<>();
-    private java.util.List<Call> program = new ArrayList<>();
-
-    private Node lastResult;
-
-    public Interpreter() {
-        env.push(new Scope("global"));
-    }
-
-    public void addTracer(Tracer tracer) {
-        tracers.add(tracer);
-        env.addTracer(tracer);
-    }
-
-    public List<Tracer> tracers() {
-        return tracers;
-    }
+    public void addTracer(Tracer tracer);
 
     /**
-     * Runs a list of procedure calls
+     * Returns the environment at this moment with all defined scopes,
+     * procedures and variables
      *
-     * @param A node which is expected to be of list type. All children will be
-     * run first-to-last
-     * @return Returns the last evaluated result
+     * @return the environment
      */
-    public Node run(Node node) {
-        tracers.forEach(t -> t.run(node));
-        
-        if (!node.type().equals(NodeType.LIST)) {
-            throw new NodeTypeException(node, node.type(), NodeType.LIST);
-        }
-
-        for (Node n : node.getChildren()) {
-            Call call = n.toProcedureCall();
-            program.add(call);
-        }
-
-        return run();
-    }
+    public Environment env();
 
     /**
-     * Runs a single procedure calls
-     *
-     * @param A valid call object
-     * @return Returns the last evaluated result
+     * Observer and helper methods
      */
-    public Node run(Call call) {
-        tracers.forEach(t -> t.run(call));
-
-        load(call);
-
-        return run();
-    }
-
-    /**
-     * Runs a previously preloaded interpreter. Can be loaded with load()
-     *
-     * @return Returns the last evaluated result
-     */
-    public Node run() {
-        while (tick()) {
-        }
-
-        return lastResult;
-    }
-
-    public void reset() {
-        program.clear();;
-        stack.clear();
-    }
+    public void inform(String output);
 
     /**
      * Loads a list of procedure calls or other nodes into the interpreter for
@@ -124,61 +40,26 @@ public class Interpreter implements OutputObserver {
      *
      * @param node A node which is expected to be of list type.
      */
-    public void load(Node node) {
-        tracers.forEach(t -> t.load(node));
+    public void load(Node node);
 
-        switch (node.type()) {
-            case LIST:
-                for (Node n : node.getChildren()) {
-                    Call call = n.toProcedureCall();
-                    tracers.forEach(t -> t.load(node));
-                    program.add(call);
-                }
-                break;
-            case PROCCALL:
-                stack.push(node.toProcedureCall());
-                break;
-            case REFERENCE:
-                lastResult = env.thing(node.toReferenceWord().getReference());
-                break;
-            default:
-                lastResult = node;
-                break;
-        }
-    }
+    public Interpreter loadStdLib();
 
-    /**
-     * Resumes evaluation after a pause call.
-     *
-     * @return Returns the last evaluated result
-     */
-    public Node resume() {
-        tracers.forEach(t -> t.resume(stack.peek()));
-        paused = false;
+    public Interpreter loadStdLib(OutputObserver oo, InputGenerator ig);
 
-        while (tick()) {
-        }
-
-        return lastResult;
-    }
+    public void output(Node node);
 
     /**
      * Pauses the interpreter. This method is intended to be used by native
      * calls only. Use at your own risk. Resume with the resume() Method.
      */
-    public void pause() {
-        tracers.forEach(t -> t.pause(stack.peek()));
-        paused = true;
-    }
+    public void pause();
 
     /**
      * Used to check if the interpreter is paused. Useful e.g. for REPLs
      *
      * @return Pause status of the interpreter. Returns true if paused
      */
-    public boolean paused() {
-        return paused;
-    }
+    public boolean paused();
 
     /**
      * Parses an input string to a executable syntax tree
@@ -187,9 +68,7 @@ public class Interpreter implements OutputObserver {
      * @return the parsed syntax tree, top element is always a list of procedure
      * calls
      */
-    public Node read(String source) {
-        return new Parser(this).read(source);
-    }
+    public Node read(String source);
 
     /**
      * Parses an input list to a executable syntax tree. This is useful e.g. for
@@ -200,23 +79,51 @@ public class Interpreter implements OutputObserver {
      * @return the parsed syntax tree, top element is always a list of procedure
      * calls
      */
-    public Node read(ch.uprisesoft.yali.ast.node.List list) {
-        return new Parser(this).read(list);
-    }
+    public Node read(List list);
+
+    public void reset();
 
     /**
-     * Returns the environment at this moment with all defined scopes,
-     * procedures and variables
+     * Resumes evaluation after a pause call.
      *
-     * @return the environment
+     * @return Returns the last evaluated result
      */
-    public Environment env() {
-        return env;
-    }
-    
-    public void output(Node node) {
-        lastResult = node;
-    }
+    public Node resume();
+
+    /**
+     * Runs a list of procedure calls
+     *
+     * @param A node which is expected to be of list type. All children will be
+     * run first-to-last
+     * @return Returns the last evaluated result
+     */
+    public Node run(Node node);
+
+    /**
+     * Runs a single procedure calls
+     *
+     * @param A valid call object
+     * @return Returns the last evaluated result
+     */
+    public Node run(Call call);
+
+    /**
+     * Runs a previously preloaded interpreter. Can be loaded with load()
+     *
+     * @return Returns the last evaluated result
+     */
+    public Node run();
+
+    /**
+     * Puts a Procedure call on the stack to be evaluated next. Also, loads a
+     * new Scope into the Environment
+     * 
+     * @param a Procedure call 
+     */
+
+    public void schedule(Call call);
+
+    public java.util.List<String> stringify(java.util.List<Node> args);
 
     /**
      * This is the main worker method of the interpreter. It does one atomic
@@ -236,194 +143,12 @@ public class Interpreter implements OutputObserver {
      * @return true if there is more to do and tick() can be called once more,
      * false otherwise.
      */
-    public boolean tick() {
+    public boolean tick();
 
-        /*
-        Global Program state
-         */
-        
-        if (paused) {
-            return false;
-        }
+    public java.util.List<Tracer> tracers();
 
-        // If the stack is empty, check for more program lines to evaluate
-        if (stack.empty()) {
-            // If both program and stack are empty, execution is finished or no
-            // program was loaded in the first place
-            if (program.isEmpty()) {
-                return false;
-            } else {
-                schedule(program.remove(0));
-                return true;
-            }
-        }
+    public Node lastResult();
 
-        /*
-        Result handling
-         */
-        
-        // Check for finished procedures. A procedure is finished when evaluated()
-        // returns true. If stack is 1 and program empty, this
-        // is the result. Else, deschedule the call and set the result to the
-        // previous call. Has to be done before argument handling.
-        if (stack.peek().evaluated()) {
-            unschedule();
-            if (stack.empty() && !program.isEmpty()) {
-                return true;
-            } else if (stack.empty() && program.isEmpty()) {
-                return false;
-            } else if (stack.size() == 1 && stack.peek().evaluated() && program.isEmpty()) {
-                return false;
-            } else if (stack.peek().hasMoreParameters()) {
-                stack.peek().arg(lastResult);
-                return true;
-            } else {
-                return true;
-            }
-        }
-
-        /*
-        Arguments evaluation
-         */
-        // Arguments are evaluated first. If a call does not have it's argument
-        // evaluated, schedule the next argument to be evaluated
-        if (stack.peek().hasMoreParameters()) {
-            Node nextParam = stack.peek().nextParameter();
-            tracers.forEach(t -> t.arg(stack.peek().getName(), nextParam, env));
-
-            // If it's not a procedure call, no evaluation is necessary. Add to
-            // arguments as-is.
-            if (!nextParam.type().equals(NodeType.PROCCALL)) {
-                stack.peek().arg(nextParam);
-                return true;
-            } else {
-                schedule(nextParam.toProcedureCall());
-                return true;
-            }
-        }
-
-        /*
-        Procedure evaluation
-         */
-        Call call = stack.peek();
-
-        // Prepare env
-        for (int i = 0; i < call.definition().getArity(); i++) {
-            env.local(call.definition().getArgs().get(i));
-            env.make(
-                    call.definition().getArgs().get(i),
-                    call.args().get(i)
-            );
-        }
-
-        if (call.definition().isNative()) {
-            tracers.forEach(t -> t.callPrimitive(call.getName(), call.args(), env));
-
-            // With a native call, the first BiFunction is applied. It should 
-            // return a result if it's a pure procedure or Node.boolean(true) if
-            // there are more steps necessary
-            Node result = call.definition().getNativeCall().apply(env.peek(), call.args());
-
-            // If the BiFunction callback for checking for more work returns true,
-            // the procedure will stay scheduled. As soon as it returns false, the
-            // call is marked as finished and descheduled in the next tick()
-            if (!nodeIsTrue(call.definition().getHasMoreCallback().apply(env.peek(), result))) {
-                call.result(result, env.peek());
-                call.evaluated(true);
-            }
-            return true;
-        } else {
-            // Handling of user-defined procedure calls. If the procedure has more 
-            // calls in it's children list, the next one is scheduled. 
-            if (call.hasMoreCalls()) {
-                schedule(call.nextCall());
-            } else {
-                // A user derfined procedure call is evaluated as soon as it has no 
-                // more procedure calls in it's children list. 
-                call.evaluated(true);
-                call.result(lastResult, env.peek());
-            }
-            return true;
-        }
-    }
-
-    private boolean nodeIsTrue(Node node) {
-        return node.type().equals(NodeType.BOOLEAN) && node.toBooleanWord().getBoolean();
-    }
-
-    private Call unschedule() {
-        Call call = stack.pop();
-
-        if (!call.definition().isMacro()) {
-            tracers.forEach(t -> t.unscope(env.peek().name(), env));
-            env.pop();
-        }
-        lastResult = call.result();
-        tracers.forEach(t -> t.unschedule(call.getName(), call, env));
-        return call;
-    }
-
-    public void schedule(Call call) {
-        tracers.forEach(t -> t.schedule(call.getName(), call, env));
-
-        if (!env.defined(call.getName())) {
-            throw new FunctionNotFoundException(call.getName());
-        }
-
-        call.definition(env.procedure(call.getName()));
-        call.reset();
-        stack.push(call);
-        if (!call.definition().isMacro()) {
-            env.push(new Scope(call.getName()));
-            tracers.forEach(t -> t.scope(env.peek().name(), env));
-        }
-    }
-
-    public Interpreter loadStdLib() {
-
-        Logic logic = new Logic();
-        logic.registerProcedures(this);
-
-        Control control = new Control();
-        control.registerProcedures(this);
-
-        Arithmetic arithmetic = new Arithmetic();
-        arithmetic.registerProcedures(this);
-
-        Template template = new Template();
-        template.registerProcedures(this);
-
-        Data data = new Data();
-        data.registerProcedures(this);
-
-        return this;
-    }
-
-    public Interpreter loadStdLib(OutputObserver oo, InputGenerator ig) {
-        IO com = new IO();
-        com.register(oo);
-        com.register(ig);
-        com.registerProcedures(this);
-
-        return loadStdLib();
-    }
-
-    public java.util.List<String> stringify(java.util.List<Node> args) {
-        java.util.List<String> stringifiedArgs = new ArrayList<>();
-        for (Node arg : args) {
-            if (arg.type().equals(NodeType.LIST)) {
-                stringifiedArgs.addAll(stringify(arg.getChildren()));
-            } else {
-                stringifiedArgs.add(arg.toString());
-            }
-        }
-        return stringifiedArgs;
-    }
-
-    /**
-     * Observer and helper methods
-     */
-    @Override
-    public void inform(String output) {
-    }
+    public boolean finished();
+    
 }

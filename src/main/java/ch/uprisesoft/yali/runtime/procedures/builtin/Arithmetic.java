@@ -33,11 +33,7 @@ import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
 public class Arithmetic implements ProcedureProvider {
 
     private boolean checkArgs(Node node) {
-        if (!(node.type().equals(NodeType.FLOAT) || node.type().equals(NodeType.INTEGER))) {
-            return false;
-        }
-
-        return true;
+        return node.type().equals(NodeType.FLOAT) || node.type().equals(NodeType.INTEGER);
     }
 
     public Node add(Scope scope, java.util.List<Node> args) {

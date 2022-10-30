@@ -109,7 +109,7 @@ public class Parser {
 
     private void parseFunctionAliases() {
         while (!isAtEnd()) {
-            if (match(TokenType.SYMBOL) && previous().getLexeme().toLowerCase().equals("alias")) {
+            if (match(TokenType.SYMBOL) && previous().getLexeme().equalsIgnoreCase("alias")) {
 
                 String original = consume(TokenType.QUOTE).getLexeme().substring(1);
                 String alias = consume(TokenType.QUOTE).getLexeme().substring(1);
@@ -124,8 +124,7 @@ public class Parser {
     }
 
     private Node parseExpression() {
-        Node node = expression();
-        return node;
+        return expression();
     }
 
     private Node expression() {
@@ -136,7 +135,7 @@ public class Parser {
     }
 
     private Node funBody() {
-        Node node = Node.none();
+        Node node;
 
         if (match(TokenType.TO)) {
 
@@ -174,7 +173,7 @@ public class Parser {
     }
 
     private Node funCall() {
-        Node node = Node.none();
+        Node node;
 
         if (current().type().equals(TokenType.SYMBOL) && it.env().defined(current().getLexeme().toLowerCase())) {
 

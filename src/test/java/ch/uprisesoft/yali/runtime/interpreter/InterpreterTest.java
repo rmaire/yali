@@ -38,7 +38,7 @@ public class InterpreterTest {
 
     private java.util.List<String> outputs;
 
-    private Interpreter it;
+    private UnthreadedInterpreter it;
 
     private OutputObserver oo;
     private InputGenerator ig;
@@ -191,5 +191,16 @@ public class InterpreterTest {
         assertThat(outputs.size(), is(1));
         assertThat(outputs.get(0), is("Blabla\n"));
 
+    }
+
+    @Test
+    public void testFinished() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("make \"size 81 / 9").append("\n");
+        sb.append("print 2*3").append("\n");
+        sb.append("print :size - 4").append("\n");
+        Node res = it.run(it.read(sb.toString()));
+
+        assertThat(it.finished(), is(true));
     }
 }

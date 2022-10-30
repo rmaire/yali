@@ -18,7 +18,7 @@ package ch.uprisesoft.yali.runtime.functions.builtin;
 import ch.uprisesoft.yali.ast.node.Node;
 import ch.uprisesoft.yali.ast.node.NodeType;
 import ch.uprisesoft.yali.helper.ObjectMother;
-import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
+import ch.uprisesoft.yali.runtime.interpreter.UnthreadedInterpreter;
 import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  */
 public class DataTest {
     
-    Interpreter it;
+    UnthreadedInterpreter it;
     private OutputObserver oo;
     private InputGenerator ig;
     private java.util.List<String> outputs;

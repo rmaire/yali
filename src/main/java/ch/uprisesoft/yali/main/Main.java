@@ -17,7 +17,7 @@ package ch.uprisesoft.yali.main;
 
 import ch.uprisesoft.yali.ast.node.Node;
 import ch.uprisesoft.yali.repl.Repl;
-import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
+import ch.uprisesoft.yali.runtime.interpreter.UnthreadedInterpreter;
 import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
 import ch.uprisesoft.yali.runtime.procedures.builtin.MockTurtleManager;
@@ -53,7 +53,7 @@ public class Main {
             }
         };
 
-        Interpreter it = new Interpreter();
+        UnthreadedInterpreter it = new UnthreadedInterpreter();
         it.loadStdLib(oo, ig);
         MockTurtleManager mtm = new MockTurtleManager();
         mtm.registerProcedures(it);

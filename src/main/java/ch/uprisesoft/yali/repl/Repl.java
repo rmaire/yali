@@ -18,7 +18,7 @@ package ch.uprisesoft.yali.repl;
 import ch.uprisesoft.yali.ast.node.Node;
 import ch.uprisesoft.yali.ast.node.NodeType;
 import ch.uprisesoft.yali.exception.NodeTypeException;
-import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
+import ch.uprisesoft.yali.runtime.interpreter.UnthreadedInterpreter;
 import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
 import ch.uprisesoft.yali.scope.VariableNotFoundException;
@@ -52,7 +52,7 @@ public class Repl implements InputGenerator, OutputObserver {
     private final InputStreamReader input;
     private final PrintStream output;
 
-    private final Interpreter interpreter;
+    private final UnthreadedInterpreter interpreter;
     private boolean procDefinitionMode = false;
     private ResourceBundle messages;
 
@@ -67,7 +67,7 @@ public class Repl implements InputGenerator, OutputObserver {
 
         procDefinitionMode = false;
 
-        interpreter = new Interpreter();
+        interpreter = new UnthreadedInterpreter();
         interpreter.loadStdLib(this, this);
 
         terminal = TerminalBuilder

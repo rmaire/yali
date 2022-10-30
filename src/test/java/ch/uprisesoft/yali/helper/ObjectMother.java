@@ -18,7 +18,7 @@ package ch.uprisesoft.yali.helper;
 import ch.uprisesoft.yali.lexer.Lexer;
 import ch.uprisesoft.yali.parser.Parser;
 import ch.uprisesoft.yali.runtime.procedures.builtin.MockTurtleManager;
-import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
+import ch.uprisesoft.yali.runtime.interpreter.UnthreadedInterpreter;
 import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
 
@@ -28,13 +28,13 @@ import ch.uprisesoft.yali.runtime.io.OutputObserver;
  */
 public class ObjectMother {
     
-    private Interpreter i;
+    private UnthreadedInterpreter i;
     private Parser p;
     private Lexer l;
     
     public ObjectMother(OutputObserver o) {
         
-        this.i = new Interpreter();
+        this.i = new UnthreadedInterpreter();
         this.p = new Parser(i);
         this.l = new Lexer();
         this.i.loadStdLib();
@@ -44,7 +44,7 @@ public class ObjectMother {
     }
     
     public ObjectMother(OutputObserver oo, InputGenerator ig) {
-        this.i = new Interpreter();
+        this.i = new UnthreadedInterpreter();
         this.i.loadStdLib(oo, ig);
         
         MockTurtleManager mtm = new MockTurtleManager();
@@ -76,7 +76,7 @@ public class ObjectMother {
             }
         };
         
-        this.i = new Interpreter();
+        this.i = new UnthreadedInterpreter();
         this.i.loadStdLib(oo, ig);
         
         MockTurtleManager mtm = new MockTurtleManager();
@@ -87,7 +87,7 @@ public class ObjectMother {
     }
 
 
-    public Interpreter getInterpreter() {
+    public UnthreadedInterpreter getInterpreter() {
         return i;
     }
 

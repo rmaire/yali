@@ -20,7 +20,7 @@ import ch.uprisesoft.yali.ast.node.NodeType;
 import ch.uprisesoft.yali.helper.ObjectMother;
 import ch.uprisesoft.yali.lexer.Lexer;
 import ch.uprisesoft.yali.parser.Parser;
-import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
+import ch.uprisesoft.yali.runtime.interpreter.UnthreadedInterpreter;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ public class LogicTest {
     
     private Lexer l;
     private Parser p;
-    private Interpreter it;
+    private UnthreadedInterpreter it;
     private OutputObserver o;
     
     public LogicTest() {
