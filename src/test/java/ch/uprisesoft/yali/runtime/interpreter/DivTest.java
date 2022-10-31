@@ -15,19 +15,18 @@
  */
 package ch.uprisesoft.yali.runtime.interpreter;
 
-import ch.uprisesoft.yali.ast.node.Node;
 import ch.uprisesoft.yali.ast.node.NodeType;
 import ch.uprisesoft.yali.exception.NodeTypeException;
+import ch.uprisesoft.yali.exception.UnexpectedCharacterException;
 import ch.uprisesoft.yali.helper.ObjectMother;
 import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
 import java.util.ArrayList;
-import org.junit.jupiter.api.Test;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 
 /**
  *
@@ -78,13 +77,13 @@ public class DivTest {
     }
 
     @Test
-    public void testFinished() {
+    public void testGibberish() {
         StringBuilder sb = new StringBuilder();
-        sb.append("make \"size 81 / 9").append("\n");
-        sb.append("print 2*3").append("\n");
-        sb.append("print :size - 4").append("\n");
-        Node res = it.run(it.read(sb.toString()));
+        sb.append("repeat 4 fd 100 rt 90]").append("\n");
+        UnexpectedCharacterException uce = assertThrows(UnexpectedCharacterException.class, () -> it.read(sb.toString()));
 
-        assertThat(it.finished(), is(true));
+        assertThat(uce.getCharacter(), is("]"));
+        assertThat(uce.getLine(), is(1));
+        assertThat(uce.getPos(), is(22));
     }
 }

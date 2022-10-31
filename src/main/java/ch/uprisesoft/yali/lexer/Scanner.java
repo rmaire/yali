@@ -35,6 +35,9 @@ public abstract class Scanner {
     protected int current = 0;
     protected int line = 1;
     protected int linePos = 0;
+    
+    protected int parenDepth = 0;
+    protected int braceDepth = 0;
 
     protected Token funStart;
     protected Token funEnd;
@@ -44,7 +47,7 @@ public abstract class Scanner {
         this.source = source;
     }
 
-    protected Scanner(Lexer context, String source, List<Token> tokens, int start, int current, int line, int linePos, Token funStart, Token funEnd) {
+    protected Scanner(Lexer context, String source, List<Token> tokens, int start, int current, int line, int linePos, Token funStart, Token funEnd, int parenDepth, int braceDepth) {
         this.context = context;
         this.source = source;
         this.tokens = tokens;
@@ -54,6 +57,8 @@ public abstract class Scanner {
         this.linePos = linePos;
         this.funStart = funStart;
         this.funEnd = funEnd;
+        this.parenDepth = parenDepth;
+        this.braceDepth = braceDepth;
     }
 
     public List<Token> getTokens() {
