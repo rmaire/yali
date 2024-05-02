@@ -78,7 +78,7 @@ public class Parser {
 
         Node program = new List();
         while (!isAtEnd()) {
-            Node expression = parseExpression();
+            Node expression = expression();
             if (!expression.type().equals(NodeType.NONE) && !expression.type().equals(NodeType.PROCEDURE)) {
                 program.addChild(expression);
             }
@@ -121,10 +121,6 @@ public class Parser {
             advance();
         }
         current = 0;
-    }
-
-    private Node parseExpression() {
-        return expression();
     }
 
     private Node expression() {

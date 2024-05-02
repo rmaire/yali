@@ -138,10 +138,6 @@ public abstract class Word extends Node {
             return this.toString().equals(other.toString());
         }
 
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-
-        return true;
+        return getClass() == obj.getClass();
     }
 }

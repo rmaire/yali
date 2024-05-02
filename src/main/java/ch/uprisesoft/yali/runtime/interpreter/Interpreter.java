@@ -100,7 +100,7 @@ public interface Interpreter extends OutputObserver {
     public Node run(Node node);
 
     /**
-     * Runs a single procedure calls
+     * Runs a single procedure call
      *
      * @param A valid call object
      * @return Returns the last evaluated result

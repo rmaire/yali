@@ -131,13 +131,6 @@ public abstract class Node {
         return (SymbolWord) this;
     }
 
-    public ReferenceWord toReferenceWord() throws NodeTypeException {
-        if (this.type() != NodeType.REFERENCE) {
-            throw new NodeTypeException(this, this.type(), NodeType.REFERENCE);
-        }
-        return (ReferenceWord) this;
-    }
-
     public Call toProcedureCall() throws NodeTypeException {
         if (this.type() != NodeType.PROCCALL) {
             throw new NodeTypeException(this, this.type(), NodeType.PROCCALL);
@@ -196,10 +189,6 @@ public abstract class Node {
 
     public static QuotedWord quote(String quote) {
         return new QuotedWord(quote);
-    }
-
-    public static ReferenceWord reference(String reference) {
-        return new ReferenceWord(reference);
     }
 
     public static List list(java.util.List<Node> list) {

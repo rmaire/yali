@@ -18,6 +18,7 @@ package ch.uprisesoft.yali.ast.node;
 import ch.uprisesoft.yali.runtime.procedures.FunctionType;
 import ch.uprisesoft.yali.scope.Scope;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -53,9 +54,7 @@ public class Procedure extends Node {
         this.name = name;
         this.nativeCall = nativeCall;
         this.hasMoreCallback = hasMoreCallback;
-        for(String arg: args) {
-            this.args.add(arg);
-        }
+        this.args.addAll(Arrays.asList(args));
     }
     
     public Procedure macro() {
@@ -132,10 +131,6 @@ public class Procedure extends Node {
             hash = 31 * hash + arg.hashCode();
         }
 
-//        if (nativeCall != null) {
-//            hash = 31 * hash + nativeCall.hashCode();
-//        }
-
         return hash;
     }
 
@@ -158,11 +153,11 @@ public class Procedure extends Node {
     }
     
     public String header() {
-        StringBuffer header = new StringBuffer();
+        StringBuilder header = new StringBuilder();
         
         header.append(this.name);
         for(String arg: args) {
-            header.append(" :" + arg);
+            header.append(" :").append(arg);
         }
         
         return header.toString();

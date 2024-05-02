@@ -99,7 +99,7 @@ public class UnthreadedInterpreter implements Interpreter {
     }
 
     /**
-     * Runs a single procedure calls
+     * Runs a single procedure call
      *
      * @param A valid call object
      * @return Returns the last evaluated result
@@ -153,9 +153,6 @@ public class UnthreadedInterpreter implements Interpreter {
                 break;
             case PROCCALL:
                 stack.push(node.toProcedureCall());
-                break;
-            case REFERENCE:
-                lastResult = env.thing(node.toReferenceWord().getReference());
                 break;
             default:
                 lastResult = node;

@@ -77,7 +77,7 @@ public class DivTest {
     }
 
     @Test
-    public void testGibberish() {
+    public void testunopenedParen() {
         StringBuilder sb = new StringBuilder();
         sb.append("repeat 4 fd 100 rt 90]").append("\n");
         UnexpectedCharacterException uce = assertThrows(UnexpectedCharacterException.class, () -> it.read(sb.toString()));

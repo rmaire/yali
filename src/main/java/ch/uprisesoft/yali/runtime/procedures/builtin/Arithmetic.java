@@ -146,26 +146,27 @@ public class Arithmetic implements ProcedureProvider {
     public Node integer(Scope scope, java.util.List<Node> args) {
         Word arg = (Word) args.get(0);
 
-        if (arg.type().equals(NodeType.INTEGER)) {
-            return arg;
-        } else if (arg.type().equals(NodeType.INTEGER)) {
-            return Node.integer(arg.toFloatWord().getFloat().intValue());
-        }
-        else {
-            throw new NodeTypeException(arg, arg.type(), NodeType.FLOAT, NodeType.INTEGER);
+        switch (arg.type()) {
+            case INTEGER:
+                return arg;
+            case FLOAT:
+                return Node.integer(arg.toFloatWord().getFloat().intValue());
+            default:
+                throw new NodeTypeException(arg, arg.type(), NodeType.FLOAT, NodeType.INTEGER);
         }
     }
+    
     
     public Node round(Scope scope, java.util.List<Node> args) {
         Word arg = (Word) args.get(0);
 
-        if (arg.type().equals(NodeType.INTEGER)) {
-            return arg;
-        } else if (arg.type().equals(NodeType.INTEGER)) {
-            return Node.integer((int)Math.round(arg.toFloatWord().getFloat()));
-        }
-        else {
-            throw new NodeTypeException(arg, arg.type(), NodeType.FLOAT, NodeType.INTEGER);
+        switch (arg.type()) {
+            case INTEGER:
+                return arg;
+            case FLOAT:
+                return Node.integer((int)Math.round(arg.toFloatWord().getFloat()));
+            default:
+                throw new NodeTypeException(arg, arg.type(), NodeType.FLOAT, NodeType.INTEGER);
         }
     }
 

@@ -31,7 +31,6 @@ public class Token {
     public Token(TokenType type, String lexeme, int line, int pos, int absolute) {
         this.type = type;
         this.lexeme = lexeme;
-//    this.literal = literal;
         this.line = line;
         this.pos = pos;
         this.absolute = absolute;
@@ -45,9 +44,6 @@ public class Token {
         return lexeme;
     }
 
-//    public Object getLiteral() {
-//        return literal;
-//    }
     public int getLine() {
         return line;
     }
