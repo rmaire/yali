@@ -38,6 +38,7 @@ public abstract class Scanner {
     
     protected int parenDepth = 0;
     protected int braceDepth = 0;
+    protected int bracketDepth = 0;
 
     protected Token funStart;
     protected Token funEnd;

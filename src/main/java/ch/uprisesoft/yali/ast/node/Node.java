@@ -35,7 +35,6 @@ public abstract class Node {
     protected NodeType type;
     protected java.util.List<Node> children = new ArrayList<>();
     protected java.util.List<Token> token = new ArrayList<>();
-//    protected Token token;
 
     public Node(NodeType type) {
         this.type = type;

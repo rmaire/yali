@@ -40,7 +40,7 @@ public class Parser {
     private final Interpreter it;
     private String source;
 
-    private int current = 0;
+    private Integer current = 0;
     private boolean inParens = false;
 
     public Parser(Interpreter functions) {
@@ -70,8 +70,6 @@ public class Parser {
         return read(newSource.toString().trim());
     }
 
-    
-    
     private Node read() {
         parseFunctionHeaders();
         parseFunctionAliases();
@@ -131,7 +129,6 @@ public class Parser {
     }
 
     private Node funBody() {
-        Node node;
 
         if (match(TokenType.TO)) {
 
@@ -160,25 +157,23 @@ public class Parser {
 
             it.env().define(fun);
 
-            node = fun;
+            return fun;
         } else {
-            node = funCall();
+            return funCall();
         }
-
-        return node;
     }
 
     private Node funCall() {
         Node node;
 
-        if (current().type().equals(TokenType.SYMBOL) && it.env().defined(current().getLexeme().toLowerCase())) {
+        if (peek().type().equals(TokenType.SYMBOL) && it.env().defined(peek().getLexeme().toLowerCase())) {
 
-            String name = current().getLexeme();
+            String name = peek().getLexeme();
             int arity = it.env().procedure(name).getArity();
             advance();
 
             node = new Call(name);
-            node.setPosInSource(current().getLine(), current().getPos());
+            node.setPosInSource(peek().getLine(), peek().getPos());
 
             if (inParens) {
                 while (!check(TokenType.RIGHT_PAREN)) {
@@ -338,7 +333,6 @@ public class Parser {
             SymbolWord symbol = new SymbolWord(previous().getLexeme().substring(1));
             symbol.token(previous());
             node.addChild(symbol);
-//            node = new ReferenceWord(previous().getLexeme().substring(1));
             node.token(previous());
         } else if (match(TokenType.LEFT_BRACKET)) {
             node = parseList();
@@ -366,14 +360,14 @@ public class Parser {
                 list.token(nestedList.token());
                 continue;
             }
-            list.addChild(new SymbolWord(current().getLexeme()));
-            list.token(current());
+            list.addChild(new SymbolWord(peek().getLexeme()));
+            list.token(peek());
             advance();
         }
         
-        int end = current().getAbsolute()+1;
+        int end = peek().getAbsolute()+1;
         list.source(source.substring(start, end));
-        list.token(current());
+        list.token(peek());
         consume(TokenType.RIGHT_BRACKET);
         
         return list;
@@ -413,10 +407,6 @@ public class Parser {
 
     private Token previous() {
         return tokens.get(current - 1);
-    }
-
-    private Token current() {
-        return tokens.get(current);
     }
 
     private Token consume(TokenType type) throws TokenTypeException {
