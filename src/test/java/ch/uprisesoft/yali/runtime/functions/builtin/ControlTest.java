@@ -76,7 +76,6 @@ public class ControlTest {
     public void testMake() {
         it.run(it.read("make \"testit \"someval"));
 
-//        assertThat(it.scope().defined("testit"), is(true));
         assertThat(it.env().thing("testit").type(), is(NodeType.QUOTE));
         assertThat(it.env().thing("testit").toQuotedWord().getQuote(), is("someval"));
     }
@@ -88,7 +87,6 @@ public class ControlTest {
 
         it.run(it.read(input));
 
-//        assertThat(it.scope().defined("testvar"), is(true));
         assertThat(it.env().thing("testvar").toQuotedWord().getQuote(), is("one"));
     }
 

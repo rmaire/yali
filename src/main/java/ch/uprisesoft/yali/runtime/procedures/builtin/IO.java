@@ -83,25 +83,6 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
         return Node.nil();
     }
 
-//    private java.util.List<String> stringify(java.util.List<Node> args, Boolean escapeLists) {
-//        java.util.List<String> stringifiedArgs = new ArrayList<>();
-//        for (Node arg : args) {
-//            if (arg.type().equals(NodeType.LIST)) {
-//                if (escapeLists) {
-//                    stringifiedArgs.add("[");
-//                }
-//                stringifiedArgs.addAll(stringify(arg.getChildren(), escapeLists));
-//                if (escapeLists) {
-//                    stringifiedArgs.add("]");
-//                }
-//            } else {
-//                logger.debug("(Communication) stringify " + arg.toString());
-//                stringifiedArgs.add(arg.toString());
-//            }
-//        }
-//        return stringifiedArgs;
-//    }
-
     public Node readword(Scope scope, java.util.List<Node> args) {
         QuotedWord result = new QuotedWord(requestLine());
         return result;
