@@ -17,7 +17,7 @@ import ch.uprisesoft.yali.scope.Environment;
  */
 public interface Interpreter extends OutputObserver {
 
-    public void addTracer(Tracer tracer);
+    void addTracer(Tracer tracer);
 
     /**
      * Returns the environment at this moment with all defined scopes,
@@ -25,12 +25,12 @@ public interface Interpreter extends OutputObserver {
      *
      * @return the environment
      */
-    public Environment env();
+	Environment env();
 
     /**
      * Observer and helper methods
      */
-    public void inform(String output);
+	void inform(String output);
 
     /**
      * Loads a list of procedure calls or other nodes into the interpreter for
@@ -40,26 +40,26 @@ public interface Interpreter extends OutputObserver {
      *
      * @param node A node which is expected to be of list type.
      */
-    public void load(Node node);
+	void load(Node node);
 
-    public Interpreter loadStdLib();
+    Interpreter loadStdLib();
 
-    public Interpreter loadStdLib(OutputObserver oo, InputGenerator ig);
+    Interpreter loadStdLib(OutputObserver oo, InputGenerator ig);
 
-    public void output(Node node);
+    void output(Node node);
 
     /**
      * Pauses the interpreter. This method is intended to be used by native
      * calls only. Use at your own risk. Resume with the resume() Method.
      */
-    public void pause();
+	void pause();
 
     /**
      * Used to check if the interpreter is paused. Useful e.g. for REPLs
      *
      * @return Pause status of the interpreter. Returns true if paused
      */
-    public boolean paused();
+	boolean paused();
 
     /**
      * Parses an input string to a executable syntax tree
@@ -68,7 +68,7 @@ public interface Interpreter extends OutputObserver {
      * @return the parsed syntax tree, top element is always a list of procedure
      * calls
      */
-    public Node read(String source);
+	Node read(String source);
 
     /**
      * Parses an input list to a executable syntax tree. This is useful e.g. for
@@ -79,16 +79,16 @@ public interface Interpreter extends OutputObserver {
      * @return the parsed syntax tree, top element is always a list of procedure
      * calls
      */
-    public Node read(List list);
+	Node read(List list);
 
-    public void reset();
+    void reset();
 
     /**
      * Resumes evaluation after a pause call.
      *
      * @return Returns the last evaluated result
      */
-    public Node resume();
+	Node resume();
 
     /**
      * Runs a list of procedure calls
@@ -97,7 +97,7 @@ public interface Interpreter extends OutputObserver {
      * run first-to-last
      * @return Returns the last evaluated result
      */
-    public Node run(Node node);
+	Node run(Node node);
 
     /**
      * Runs a single procedure call
@@ -105,14 +105,14 @@ public interface Interpreter extends OutputObserver {
      * @param A valid call object
      * @return Returns the last evaluated result
      */
-    public Node run(Call call);
+	Node run(Call call);
 
     /**
      * Runs a previously preloaded interpreter. Can be loaded with load()
      *
      * @return Returns the last evaluated result
      */
-    public Node run();
+	Node run();
 
     /**
      * Puts a Procedure call on the stack to be evaluated next. Also, loads a
@@ -121,9 +121,9 @@ public interface Interpreter extends OutputObserver {
      * @param a Procedure call 
      */
 
-    public void schedule(Call call);
+	void schedule(Call call);
 
-    public java.util.List<String> stringify(java.util.List<Node> args);
+    java.util.List<String> stringify(java.util.List<Node> args);
 
     /**
      * This is the main worker method of the interpreter. It does one atomic
@@ -143,12 +143,12 @@ public interface Interpreter extends OutputObserver {
      * @return true if there is more to do and tick() can be called once more,
      * false otherwise.
      */
-    public boolean tick();
+	boolean tick();
 
-    public java.util.List<Tracer> tracers();
+    java.util.List<Tracer> tracers();
 
-    public Node lastResult();
+    Node lastResult();
 
-    public boolean finished();
+    boolean finished();
     
 }

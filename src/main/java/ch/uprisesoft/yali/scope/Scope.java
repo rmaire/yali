@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * A scope contains all variables of a program part. Scopes are nested and local 
  * to a procedure call. This enables dynamic scoping. there are occurrences where a
- * procedure call is evaluated in the scope of it's caller. Those procedures
+ * procedure call is evaluated in the scope of its caller. Those procedures
  * are called macros. Macro handling is done at interpreter level, the scope
  * itself is not aware of the procedure call it closes over.
  * 

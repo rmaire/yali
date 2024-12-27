@@ -26,7 +26,6 @@ import ch.uprisesoft.yali.ast.node.word.ReferenceWord;
 import ch.uprisesoft.yali.ast.node.word.SymbolWord;
 import ch.uprisesoft.yali.lexer.Token;
 import java.util.ArrayList;
-//import org.ainslec.picocog.PicoWriter;
 
 public abstract class Node {
 
@@ -57,8 +56,6 @@ public abstract class Node {
     
     public void token(java.util.List<Token> token) {
         this.token.addAll(token);
-//        this.line = token.getLine();
-//        this.col = token.getPos();
     }
 
     public int getLine() {
@@ -87,6 +84,8 @@ public abstract class Node {
 
     @Override
     public abstract String toString();
+
+    public abstract Node copy();
 
     public BooleanWord toBooleanWord() throws NodeTypeException {
         if (this.type() != NodeType.BOOLEAN) {

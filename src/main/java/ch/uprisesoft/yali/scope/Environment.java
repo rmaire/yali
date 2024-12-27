@@ -26,12 +26,12 @@ import java.util.List;
  *A datastructure to manage the scopes in a running program. Yali is dynamic 
  * scoped. This means that variable resolution searches up the calling chain, and 
  * not the lexical (written) definition of functions as most programming languages
- * do. This has the advantage that nested calls behaves kind of like closures and
- * enables some nice tricks with macros and global variables. It is also a little 
+ * do. This has the advantage that nested calls behave like a kind of closures and
+ * enable some nice tricks with macros and global variables. It is also a little
  * bit more intuitive for children and absolute beginners (the target demography 
  * for yali). 
- * Neverthless it irks professional programmers because the scoping isn't as clear
- * while reading code as with lexical scoping. Also, it is prone to overwriting
+ * Nevertheless, it irks professional programmers because the scoping isn't as clear
+ * while reading code as with lexical scoping. Also, it is prone to overwrite
  * variables in global scope.
  * 
  * @author uprisesoft@gmail.com
@@ -52,20 +52,7 @@ public class Environment {
 
     public boolean push(Scope scope) {
         scopes.add(scope);
-        for(int i = scopes.size() -2; i >= 0; i--) {
-                Scope currentScope = scopes.get(i);
-                if(scope.name().equals(currentScope.name())) {
-//                    for(int j = scopes.size()-1; j>=i; j--) {
-//                        scopes.remove(j);
-//                        scopes.add(currentScope);
-//                    }
-//                    return true;
-                } else {
-                }
-            }
-        
-//        scopes.add(scope);
-        return false;
+        return true;
     }
 
     public Scope pop() {
@@ -126,8 +113,8 @@ public class Environment {
      * Procedures
      */
     
-    public void define(Procedure function) {
-        first().make(function.getName(), function);
+    public void define(Procedure procedure) {
+        first().make(procedure.getName(), procedure);
     }
 
     public Boolean defined(String name) {

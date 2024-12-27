@@ -23,7 +23,6 @@ public class Token {
 
     private final TokenType type;
     private final String lexeme;
-//  final Object literal;
     private final int line;
     private final int pos;
     private final int absolute;
@@ -34,6 +33,10 @@ public class Token {
         this.line = line;
         this.pos = pos;
         this.absolute = absolute;
+    }
+
+    public Token copy(){
+        return new Token(this.type, this.lexeme, this.line, this.pos, this.absolute);
     }
 
     public TokenType type() {
