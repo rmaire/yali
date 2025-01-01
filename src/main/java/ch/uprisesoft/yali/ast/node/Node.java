@@ -85,8 +85,6 @@ public abstract class Node {
     @Override
     public abstract String toString();
 
-    public abstract Node copy();
-
     public BooleanWord toBooleanWord() throws NodeTypeException {
         if (this.type() != NodeType.BOOLEAN) {
             throw new NodeTypeException(this, this.type(), NodeType.BOOLEAN);

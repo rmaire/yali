@@ -33,9 +33,7 @@ import org.junit.jupiter.api.BeforeEach;
  * @author uprisesoft@gmail.com
  */
 public class IOTest {
-        
-    private Lexer l;
-    private Parser p;
+
     private UnthreadedInterpreter it;
     private OutputObserver oo;
     private InputGenerator ig;
@@ -68,9 +66,7 @@ public class IOTest {
         };
         
         ObjectMother om = new ObjectMother(oo, ig);
-        
-        l = om.getLexer();
-        p = om.getParser();
+
         it = om.getInterpreter();
         
         outputs = new ArrayList<>();

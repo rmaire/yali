@@ -20,6 +20,7 @@ import ch.uprisesoft.yali.ast.node.Node;
 import ch.uprisesoft.yali.ast.node.NodeType;
 import ch.uprisesoft.yali.helper.ObjectMother;
 import ch.uprisesoft.yali.lexer.Lexer;
+import ch.uprisesoft.yali.runtime.interpreter.UnthreadedInterpreter;
 import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
 import java.util.ArrayList;
@@ -68,8 +69,9 @@ public class ParserTest {
         };
 
         ObjectMother om = new ObjectMother(oo, ig);
+        UnthreadedInterpreter it = om.getInterpreter();
 
-        p = om.getParser();
+        p = new Parser(it);
     }
 
     private Node parse(String input) {

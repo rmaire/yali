@@ -32,9 +32,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author uprisesoft@gmail.com
  */
 public class LogicTest {
-    
-    private Lexer l;
-    private Parser p;
+
     private UnthreadedInterpreter it;
     private OutputObserver o;
     
@@ -50,9 +48,7 @@ public class LogicTest {
         };
         
         ObjectMother om = new ObjectMother(o);
-        
-        l = om.getLexer();
-        p = om.getParser();
+
         it = om.getInterpreter();
     }
 

@@ -34,9 +34,7 @@ import org.junit.jupiter.api.Disabled;
  * @author uprisesoft@gmail.com
  */
 public class TokenizeListTest {
-        
-    private Lexer l;
-    private Parser p;
+
     private UnthreadedInterpreter it;
     private OutputObserver oo;
     private InputGenerator ig;
@@ -69,9 +67,7 @@ public class TokenizeListTest {
         };
         
         ObjectMother om = new ObjectMother(oo, ig);
-        
-        l = om.getLexer();
-        p = om.getParser();
+
         it = om.getInterpreter();
         
         outputs = new ArrayList<>();

@@ -37,9 +37,7 @@ import org.junit.jupiter.api.Disabled;
  */
 
 public class TemplateTest {
-        
-    private Lexer l;
-    private Parser p;
+
     private UnthreadedInterpreter it;
     private OutputObserver oo;
     private InputGenerator ig;
@@ -72,9 +70,7 @@ public class TemplateTest {
         };
         
         ObjectMother om = new ObjectMother(oo, ig);
-        
-        l = om.getLexer();
-        p = om.getParser();
+
         it = om.getInterpreter();
         
         outputs = new ArrayList<>();

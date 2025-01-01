@@ -91,11 +91,4 @@ public class ObjectMother {
         return i;
     }
 
-    public Parser getParser() {
-        return p;
-    }
-
-    public Lexer getLexer() {
-        return l;
-    }
 }
