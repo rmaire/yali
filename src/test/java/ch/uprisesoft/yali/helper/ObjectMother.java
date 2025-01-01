@@ -27,68 +27,48 @@ import ch.uprisesoft.yali.runtime.io.OutputObserver;
  * @author uprisesoft@gmail.com
  */
 public class ObjectMother {
-    
-    private UnthreadedInterpreter i;
-    private Parser p;
-    private Lexer l;
-    
-    public ObjectMother(OutputObserver o) {
-        
-        this.i = new UnthreadedInterpreter();
-        this.p = new Parser(i);
-        this.l = new Lexer();
-        this.i.loadStdLib();
-        
-        MockTurtleManager mtm = new MockTurtleManager();
-        mtm.registerProcedures(i);
-    }
-    
-    public ObjectMother(OutputObserver oo, InputGenerator ig) {
-        this.i = new UnthreadedInterpreter();
-        this.i.loadStdLib(oo, ig);
-        
-        MockTurtleManager mtm = new MockTurtleManager();
-        mtm.registerProcedures(i);
-        
-        this.p = new Parser(i);
-        this.l = new Lexer();
-    }
-    
-    public ObjectMother() {
-        
-        OutputObserver oo = new OutputObserver() {
-            
-            @Override
-            public void inform(String output) {
-                System.out.println(output);
-            }
-        };
-        
-        InputGenerator ig = new InputGenerator() {
-            @Override
-            public String request() {
-                return "requestedinput";
-            }
-
-            @Override
-            public String requestLine() {
-                return "requestedinputline";
-            }
-        };
-        
-        this.i = new UnthreadedInterpreter();
-        this.i.loadStdLib(oo, ig);
-        
-        MockTurtleManager mtm = new MockTurtleManager();
-        mtm.registerProcedures(i);
-        
-        this.p = new Parser(i);
-        this.l = new Lexer();
-    }
-
 
     public UnthreadedInterpreter getInterpreter() {
-        return i;
+		OutputObserver oo = new OutputObserver() {
+
+			@Override
+			public void inform(String output) {
+				System.out.println(output);
+			}
+		};
+
+		InputGenerator ig = new InputGenerator() {
+			@Override
+			public String request() {
+				return "requestedinput";
+			}
+
+			@Override
+			public String requestLine() {
+				return "requestedinputline";
+			}
+		};
+
+		UnthreadedInterpreter i = new UnthreadedInterpreter();
+		i.loadStdLib(oo, ig);
+
+		MockTurtleManager mtm = new MockTurtleManager();
+		mtm.registerProcedures(i);
+
+		Parser p = new Parser(i);
+
+		return i;
     }
 
+	public UnthreadedInterpreter getInterpreter(OutputObserver oo ,InputGenerator ig) {
+		UnthreadedInterpreter i = new UnthreadedInterpreter();
+		i.loadStdLib(oo, ig);
+
+		MockTurtleManager mtm = new MockTurtleManager();
+		mtm.registerProcedures(i);
+
+		Parser p = new Parser(i);
+
+		return i;
+	}
 }

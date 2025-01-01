@@ -21,6 +21,7 @@ import ch.uprisesoft.yali.helper.ObjectMother;
 import ch.uprisesoft.yali.lexer.Lexer;
 import ch.uprisesoft.yali.parser.Parser;
 import ch.uprisesoft.yali.runtime.interpreter.UnthreadedInterpreter;
+import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,214 +35,228 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class LogicTest {
 
     private UnthreadedInterpreter it;
-    private OutputObserver o;
+    private OutputObserver oo;
+    private InputGenerator ig;
     
     public LogicTest() {
     }
     
     @BeforeEach
     public void setUp() {
-        o = new OutputObserver() {
+        oo = new OutputObserver() {
             @Override
             public void inform(String output) {
             }
         };
-        
-        ObjectMother om = new ObjectMother(o);
 
-        it = om.getInterpreter();
+        ig = new InputGenerator() {
+
+            @Override
+            public String request() {
+                return "requestedinput";
+            }
+
+            @Override
+            public String requestLine() {
+                return "requestedinputline";
+            }
+        };
+
+        it = new ObjectMother().getInterpreter(oo, ig);
     }
+
+
 
     @Test
     public void testEqual() {
-        o.inform("Start testEqual()");
+        oo.inform("Start testEqual()");
         String input = "2 = 2";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(true));
                 
-        o.inform("End testEqual()");
+        oo.inform("End testEqual()");
     }
     
     @Test
     public void testNotEqual() {
-        o.inform("Start testNotEqual()");
+        oo.inform("Start testNotEqual()");
         String input = "2 = 3";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(false));
                 
-        o.inform("End testNotEqual()");
+        oo.inform("End testNotEqual()");
     }
     
     @Test
     public void testDoubleEqual() {
-        o.inform("Start testDoubleEqual()");
+        oo.inform("Start testDoubleEqual()");
         String input = "2 == 2";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(true));
                 
-        o.inform("End testDoubleEqual()");
+        oo.inform("End testDoubleEqual()");
     }
     
     @Test
     public void testNotDoubleEqual() {
-        o.inform("Start testNotDoubleEqual()");
+        oo.inform("Start testNotDoubleEqual()");
         String input = "2 == 3";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(false));
                 
-        o.inform("End testNotDoubleEqual()");
+        oo.inform("End testNotDoubleEqual()");
     }
 
     @Test
     public void testInequal() {
-        o.inform("Start testInequal()");
+        oo.inform("Start testInequal()");
         String input = "2 != 3";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(true));
                 
-        o.inform("End testInequal()");
+        oo.inform("End testInequal()");
     }
     
     @Test
     public void testNotInequal() {
-        o.inform("Start testNotInequal()");
+        oo.inform("Start testNotInequal()");
         String input = "2 != 2";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(false));
                 
-        o.inform("End testNotInequal()");
+        oo.inform("End testNotInequal()");
     }
 
     @Test
     public void testGreater() {
-        o.inform("Start testGreater()");
+        oo.inform("Start testGreater()");
         String input = "2 > 1";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(true));
                 
-        o.inform("End testGreater()");
+        oo.inform("End testGreater()");
     }
     
     @Test
     public void testNotGreater() {
-        o.inform("Start testNotGreater()");
+        oo.inform("Start testNotGreater()");
         String input = "1 > 2";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(false));
         
-        o.inform("End testNotGreater()");
+        oo.inform("End testNotGreater()");
     }
 
     @Test
     public void testLess() {
-        o.inform("Start testLess()");
+        oo.inform("Start testLess()");
         String input = "1 < 2";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(true));
         
-        o.inform("End testLess()");
+        oo.inform("End testLess()");
     }
     
     @Test
     public void testNotLess() {
-        o.inform("Start testNotLess()");
+        oo.inform("Start testNotLess()");
         String input = "2 < 1";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(false));
         
-        o.inform("End testNotLess()");
+        oo.inform("End testNotLess()");
     }
 
     @Test
     public void testGreaterorequal() {
-        o.inform("Start testGreaterorequal()");
+        oo.inform("Start testGreaterorequal()");
         String input = "2 >= 1";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(true));
         
-        o.inform("End testGreaterorequal()");
+        oo.inform("End testGreaterorequal()");
     }
     
     @Test
     public void testNotGreaterorequal() {
-        o.inform("Start testNotGreaterorequal()");
+        oo.inform("Start testNotGreaterorequal()");
         String input = "2 >= 3";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(false));
         
-        o.inform("End testNotGreaterorequal()");
+        oo.inform("End testNotGreaterorequal()");
     }
     
     @Test
     public void testGreaterorequalSameVal() {
-        o.inform("Start testGreaterorequal()");
+        oo.inform("Start testGreaterorequal()");
         String input = "2 >= 2";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(true));
         
-        o.inform("End testGreaterorequal()");
+        oo.inform("End testGreaterorequal()");
     }
 
     @Test
     public void testLessorequal() {
-        o.inform("Start testLessorequal()");
+        oo.inform("Start testLessorequal()");
         String input = "1 <= 2";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(true));
         
-        o.inform("End testLessorequal()");
+        oo.inform("End testLessorequal()");
     }
     
     @Test
     public void testNotLessorequal() {
-        o.inform("Start testNotLessorequal()");
+        oo.inform("Start testNotLessorequal()");
         String input = "3 <= 2";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(false));
         
-        o.inform("End testNotLessorequal()");
+        oo.inform("End testNotLessorequal()");
     }
     
     @Test
     public void testLessorequalSameVal() {
-        o.inform("Start testLessorequalSameVal()");
+        oo.inform("Start testLessorequalSameVal()");
         String input = "2 <= 2";
         Node res = it.run(it.read(input));
                 
         assertThat(res.type(), is(NodeType.BOOLEAN));
         assertThat(res.toBooleanWord().getBoolean(), is(true));
         
-        o.inform("End testLessorequalSameVal()");
+        oo.inform("End testLessorequalSameVal()");
     }
     
 }

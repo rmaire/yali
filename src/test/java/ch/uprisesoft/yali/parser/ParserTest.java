@@ -68,8 +68,7 @@ public class ParserTest {
             }
         };
 
-        ObjectMother om = new ObjectMother(oo, ig);
-        UnthreadedInterpreter it = om.getInterpreter();
+        UnthreadedInterpreter it = new ObjectMother().getInterpreter(oo, ig);
 
         p = new Parser(it);
     }

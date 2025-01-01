@@ -67,9 +67,7 @@ public class ControlTest {
             }
         };
 
-        ObjectMother om = new ObjectMother(oo, ig);
-
-        it = om.getInterpreter();
+        it = new ObjectMother().getInterpreter(oo, ig);
     }
 
     @Test

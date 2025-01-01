@@ -66,9 +66,7 @@ public class ScopingTest {
             }
         };
 
-        ObjectMother om = new ObjectMother(oo, ig);
-
-        it = om.getInterpreter();
+        it = new ObjectMother().getInterpreter(oo, ig);
 //        it.addTracer(new PrintingTracer());
     }
 

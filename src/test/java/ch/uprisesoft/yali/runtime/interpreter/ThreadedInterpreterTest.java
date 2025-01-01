@@ -75,9 +75,7 @@ public class ThreadedInterpreterTest {
         };
 
 
-
-        ObjectMother om = new ObjectMother(oo, ig);
-        it = new ThreadedInterpreter(om.getInterpreter());
+        it = new ThreadedInterpreter(new ObjectMother().getInterpreter(oo, ig));
         it.loadStdLib(oo, ig);
 //        it = om.getInterpreter();
     }
