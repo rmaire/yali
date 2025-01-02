@@ -31,8 +31,6 @@ import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
  */
 public class Template implements ProcedureProvider {
 
-    private Interpreter it;
-
     private Node mapTemplate = Node.none();
     private java.util.List<Node> mapResults = new ArrayList<>();
     private java.util.List<Node> mapValues = new ArrayList<>();
@@ -48,7 +46,7 @@ public class Template implements ProcedureProvider {
 
         if (mapRunning && mapValues.isEmpty()) {
             mapRunning = false;
-            return mapResult();
+            return mapResult(scope.callingInterpreter());
         }
 
         if (!mapRunning) {
@@ -84,10 +82,10 @@ public class Template implements ProcedureProvider {
         }
 
         String realizedString = Node.list(realizedValues).toString().substring(1, Node.list(realizedValues).toString().length() - 1);
-        Call c = it.read("make \"__last_map_result__ " + realizedString).getChildren().get(0).toProcedureCall();
-        it.schedule(c);
+        Call c = scope.callingInterpreter().read("make \"__last_map_result__ " + realizedString).getChildren().get(0).toProcedureCall();
+        scope.callingInterpreter().schedule(c);
 
-        return mapResult();
+        return mapResult(scope.callingInterpreter());
     }
 
     public Node mapFinished(Scope scope, Node result) {
@@ -100,7 +98,7 @@ public class Template implements ProcedureProvider {
         return Node.bool(true);
     }
 
-    private Node mapResult() {
+    private Node mapResult(Interpreter it) {
         if (mapIsList) {
             return Node.list(mapResults);
         } else {
@@ -132,7 +130,7 @@ public class Template implements ProcedureProvider {
 
         if (filterRunning && filterValues.isEmpty()) {
             filterRunning = false;
-            return filterResult();
+            return filterResult(scope.callingInterpreter());
         }
 
         if (!filterRunning) {
@@ -168,10 +166,10 @@ public class Template implements ProcedureProvider {
         }
 
         String realizedString = Node.list(realizedValues).toString().substring(1, Node.list(realizedValues).toString().length() - 1);
-        Call c = it.read("make \"__last_filter_result__ " + realizedString).getChildren().get(0).toProcedureCall();
-        it.schedule(c);
+        Call c = scope.callingInterpreter().read("make \"__last_filter_result__ " + realizedString).getChildren().get(0).toProcedureCall();
+        scope.callingInterpreter().schedule(c);
 
-        return filterResult();
+        return filterResult(scope.callingInterpreter());
     }
 
     public Node filterFinished(Scope scope, Node result) {
@@ -184,7 +182,7 @@ public class Template implements ProcedureProvider {
         return Node.bool(true);
     }
 
-    private Node filterResult() {
+    private Node filterResult(Interpreter it) {
         if (filterIsList) {
             return Node.list(filterResults);
         } else {
@@ -268,8 +266,7 @@ public class Template implements ProcedureProvider {
 //    }
 
     @Override
-    public Interpreter registerProcedures(Interpreter interpreter) {
-        this.it = interpreter;
+    public Interpreter registerProcedures(Interpreter it) {
 
         it.env().define(new Procedure("map", (scope, val) -> this.map(scope, val), (scope, val) -> this.mapFinished(scope, val), "__template__", "__values__").macro());
         it.env().define(new Procedure("filter", (scope, val) -> this.filter(scope, val), (scope, val) -> this.filterFinished(scope, val), "__template__", "__values__").macro());

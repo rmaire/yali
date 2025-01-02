@@ -84,13 +84,11 @@ public class InterpreterForkTest {
         fork.addTracer(tracer2);
     }
 
-    @Disabled
     @Test
     public void testRootScopesAteSame(){
         assertThat(it.env().first().equals(fork.env().first()), is(true));
     }
 
-    @Disabled
     @Test
     public void testMakeWorks(){
         String input = "make \"test true";
@@ -100,7 +98,6 @@ public class InterpreterForkTest {
         assertThat(fork.env().thingable("test"), is(true));
     }
 
-    @Disabled
     @Test
     public void testToWorks(){
         String input = "to testit\n"
@@ -112,7 +109,6 @@ public class InterpreterForkTest {
         assertThat(fork.env().thingable("testit"), is(true));
     }
 
-    @Disabled
     @Test
     public void testForkedInterpreter() {
         StringBuilder sb = new StringBuilder();
@@ -121,7 +117,6 @@ public class InterpreterForkTest {
         assertThat(res.toString(), is("[0 0]"));
     }
 
-    @Disabled
     @Test
     public void testForkedEnv() {
         StringBuilder sb = new StringBuilder();
@@ -134,16 +129,15 @@ public class InterpreterForkTest {
         assertThat(res.toString(), is("[Ada_Lovelace]"));
     }
 
-    @Disabled
     @Test
     public void testForkedProcedure1() {
-        String input = "to TESTIT\n"
+        String input = "to TESTPROC\n"
                 + "print \"Hello\n"
                 + "end\n";
 
         it.run(it.read(input));
 
-        input = "TESTIT\n";
+        input = "TESTPROC\n";
 
         fork.run(fork.read(input));
 

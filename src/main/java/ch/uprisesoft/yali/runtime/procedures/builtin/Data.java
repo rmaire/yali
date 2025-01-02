@@ -37,8 +37,6 @@ import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
  */
 public class Data implements ProcedureProvider {
 
-    private Interpreter it;
-
     // Constructors
     public Node reverse(Scope scope, java.util.List<Node> args) {
         if (args.get(0).type().equals(NodeType.LIST)) {
@@ -470,8 +468,6 @@ public class Data implements ProcedureProvider {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        this.it = it;
-
         it.env().define(new Procedure("uppercase", (scope, val) -> this.uppercase(scope, val), (scope, val) -> Node.none(), "__element__"));
         it.env().define(new Procedure("lowercase", (scope, val) -> this.lowercase(scope, val), (scope, val) -> Node.none(), "__element__"));
         it.env().define(new Procedure("count", (scope, val) -> this.count(scope, val), (scope, val) -> Node.none(), "__element__"));

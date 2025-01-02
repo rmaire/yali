@@ -16,6 +16,8 @@
 package ch.uprisesoft.yali.scope;
 
 import ch.uprisesoft.yali.ast.node.Node;
+import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +36,7 @@ public class Scope {
 
     private String scopeName = "";
     private Map<String, Node> members = new HashMap<>();
+    private Interpreter callingInterpreter;
 
     public Scope(String scopeName) {
         this.scopeName = scopeName;
@@ -41,6 +44,14 @@ public class Scope {
 
     public String name() {
         return scopeName;
+    }
+
+    public Interpreter callingInterpreter() {
+        return callingInterpreter;
+    }
+
+    public void callingInterpreter(Interpreter callingInterpreter) {
+        this.callingInterpreter = callingInterpreter;
     }
 
     /**

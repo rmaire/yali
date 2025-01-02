@@ -31,8 +31,6 @@ import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
  */
 public class Logic implements ProcedureProvider {
 
-    private Interpreter it;
-
     public Node equal(Scope scope, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
@@ -147,8 +145,6 @@ public class Logic implements ProcedureProvider {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        this.it = it;
-
         it.env().define(new Procedure("equal?", (scope, val) -> this.equal(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
         it.env().define(new Procedure("notequal?", (scope, val) -> this.inequal(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
         it.env().define(new Procedure("less?", (scope, val) -> this.less(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));

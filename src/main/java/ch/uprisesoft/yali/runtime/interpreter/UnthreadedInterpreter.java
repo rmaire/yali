@@ -348,6 +348,7 @@ public class UnthreadedInterpreter implements Interpreter {
             // With a native call, the first BiFunction is applied. It should 
             // return a result if it's a pure procedure or Node.boolean(true) if
             // there are more steps necessary
+            env.peek().callingInterpreter(this);
             Node result = call.definition().getNativeCall().apply(env.peek(), call.args());
 
             // If the BiFunction callback for checking for more work returns true,
@@ -392,17 +393,19 @@ public class UnthreadedInterpreter implements Interpreter {
 
     @Override
     public void schedule(Call call) {
-        tracers.forEach(t -> t.schedule(call.getName(), call, env));
+        String name = call.getName().toLowerCase();
 
-        if (!env.defined(call.getName())) {
+        tracers.forEach(t -> t.schedule(name, call, env));
+
+        if (!env.defined(name)) {
             throw new FunctionNotFoundException(call.getName());
         }
 
-        call.definition(env.procedure(call.getName()));
+        call.definition(env.procedure(name));
         call.reset();
         stack.push(call);
         if (!call.definition().isMacro()) {
-            env.push(new Scope(call.getName()));
+            env.push(new Scope(name));
             tracers.forEach(t -> t.scope(env.peek().name(), env));
         }
     }

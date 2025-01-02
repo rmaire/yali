@@ -38,7 +38,6 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
 
     private java.util.List<OutputObserver> observers = new ArrayList<>();
     private InputGenerator generator;
-    private Interpreter it;
 
     public Node print(Scope scope, java.util.List<Node> args) {
         java.util.List<Node> concreteArgs = new ArrayList<>();
@@ -60,7 +59,7 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
         }
         
         java.util.List<String> stringifiedArgs = new ArrayList<>();
-        stringifiedArgs.addAll(it.stringify(concreteArgs));
+        stringifiedArgs.addAll(scope.callingInterpreter().stringify(concreteArgs));
 
         inform(String.join(" ", stringifiedArgs) + "\n");
 
@@ -69,7 +68,7 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
 
     public Node show(Scope scope, java.util.List<Node> args) {
         java.util.List<String> stringifiedArgs = new ArrayList<>();
-        stringifiedArgs.addAll(it.stringify(args));
+        stringifiedArgs.addAll(scope.callingInterpreter().stringify(args));
 
         inform(String.join(" ", stringifiedArgs) + "\n");
         return Node.nil();
@@ -77,7 +76,7 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
 
     public Node type(Scope scope, java.util.List<Node> args) {
         java.util.List<String> stringifiedArgs = new ArrayList<>();
-        stringifiedArgs.addAll(it.stringify(args));
+        stringifiedArgs.addAll(scope.callingInterpreter().stringify(args));
 
         inform(String.join(" ", stringifiedArgs));
         return Node.nil();
@@ -95,15 +94,13 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
         list.append(requestLine());
         list.append("]");
 
-        List result = (List) it.read(list.toString());
+        List result = (List) scope.callingInterpreter().read(list.toString());
 
         return result;
     }
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        this.it = it;
-        
         it.env().define(new Procedure("readword", (scope, val) -> this.readword(scope, val), (scope, val) -> Node.none()));
         it.env().define(new Procedure("readlist", (scope, val) -> this.readlist(scope, val), (scope, val) -> Node.none()));
         it.env().define(new Procedure("show", (scope, val) -> this.show(scope, val), (scope, val) -> Node.none(), "__output__"));
