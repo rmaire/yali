@@ -43,7 +43,7 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
     public Node print(Scope scope, java.util.List<Node> args) {
         java.util.List<Node> concreteArgs = new ArrayList<>();
         
-        List ret = new List();
+        List returnValue = new List();
         for(Node arg: args) {
             switch (arg.type()) {
                 case SYMBOL:
@@ -56,7 +56,7 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
                     concreteArgs.add(arg);
                     break;
             }
-            ret.addChild(arg);
+            returnValue.addChild(arg);
         }
         
         java.util.List<String> stringifiedArgs = new ArrayList<>();
@@ -64,7 +64,7 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
 
         inform(String.join(" ", stringifiedArgs) + "\n");
 
-        return ret;
+        return returnValue;
     }
 
     public Node show(Scope scope, java.util.List<Node> args) {

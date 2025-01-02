@@ -286,6 +286,7 @@ public class UnthreadedInterpreter implements Interpreter {
         /*
         Result handling
          */
+
         // Check for finished procedures. A procedure is finished when evaluated()
         // returns true. If stack is 1 and program empty, this
         // is the result. Else, deschedule the call and set the result to the
@@ -309,7 +310,8 @@ public class UnthreadedInterpreter implements Interpreter {
         /*
         Arguments evaluation
          */
-        // Arguments are evaluated first. If a call does not have it's argument
+
+        // Arguments are evaluated first. If a call does not have all of its argument
         // evaluated, schedule the next argument to be evaluated
         if (stack.peek().hasMoreParameters()) {
             Node nextParam = stack.peek().nextParameter();
@@ -358,7 +360,7 @@ public class UnthreadedInterpreter implements Interpreter {
             return true;
         } else {
             // Handling of user-defined procedure calls. If the procedure has more 
-            // calls in it's children list, the next one is scheduled. 
+            // calls in its children list, the next one is scheduled.
             tracers.forEach(t -> t.call(call.getName(), call.args(), env));
             if (call.hasMoreCalls()) {
                 schedule(call.nextCall());
@@ -428,10 +430,10 @@ public class UnthreadedInterpreter implements Interpreter {
 
     @Override
     public Interpreter loadStdLib(OutputObserver oo, InputGenerator ig) {
-        IO com = new IO();
-        com.register(oo);
-        com.register(ig);
-        com.registerProcedures(this);
+        IO io = new IO();
+        io.register(oo);
+        io.register(ig);
+        io.registerProcedures(this);
 
         return loadStdLib();
     }

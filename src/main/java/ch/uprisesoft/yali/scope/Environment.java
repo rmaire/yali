@@ -59,10 +59,15 @@ public class Environment {
         return scopes.remove(scopes.size() - 1);
     }
     
-    private Scope first() {
+    public Scope first() {
         return scopes.get(0);
     }
-    
+
+    public void first(Scope first) {
+         scopes.set(0, first);
+    }
+
+
     /**
      * Variables
      */

@@ -30,9 +30,11 @@ import java.util.List;
 public class PrintingTracer implements Tracer {
     
     private final UnthreadedInterpreter it;
+    private final String prefix;
 
-    public PrintingTracer(UnthreadedInterpreter it) {
+    public PrintingTracer(UnthreadedInterpreter it, String prefix) {
         this.it = it;
+        this.prefix = prefix;
     }
 
     @Override
@@ -119,7 +121,7 @@ public class PrintingTracer implements Tracer {
     }
     
     private String lpad(){
-        String lpad = String.join("", Collections.nCopies(it.env().size(), ">")) + " ";
+        String lpad = prefix + String.join("", Collections.nCopies(it.env().size(), ">")) + " ";
         return lpad;        
     }
 }

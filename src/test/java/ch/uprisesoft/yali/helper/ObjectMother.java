@@ -21,6 +21,7 @@ import ch.uprisesoft.yali.runtime.procedures.builtin.MockTurtleManager;
 import ch.uprisesoft.yali.runtime.interpreter.UnthreadedInterpreter;
 import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
+import ch.uprisesoft.yali.scope.Scope;
 
 /**
  *
@@ -70,5 +71,19 @@ public class ObjectMother {
 		Parser p = new Parser(i);
 
 		return i;
+	}
+
+	public UnthreadedInterpreter fork(UnthreadedInterpreter original, OutputObserver oo ,InputGenerator ig) {
+		UnthreadedInterpreter fork = new UnthreadedInterpreter();
+
+		fork.env().first(original.env().first());
+		//fork.loadStdLib(oo, ig);
+
+		//MockTurtleManager mtm = new MockTurtleManager();
+		//mtm.registerProcedures(fork);
+
+		Parser p = new Parser(fork);
+
+		return fork;
 	}
 }
