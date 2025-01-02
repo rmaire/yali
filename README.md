@@ -13,12 +13,7 @@ mvn -Pgithub deploy
 Or install locally
 
 ```
-mvn install:install-file \
-   -Dfile=target/yali-0.0.6.jar \
-   -DgroupId=ch.uprisesoft \
-   -DartifactId=yali \
-   -Dversion=0.0.6 \
-   -Dpackaging=jar
+mvn install:install-file -Dfile=target/yali-0.0.7.jar -DgroupId=ch.uprisesoft -DartifactId=yali -Dversion=0.0.7 -Dpackaging=jar
 ```
 
 # Embedding
