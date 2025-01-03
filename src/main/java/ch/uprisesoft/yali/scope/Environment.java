@@ -119,23 +119,37 @@ public class Environment {
      */
     
     public void define(Procedure procedure) {
-        first().make(procedure.getName(), procedure);
+        peek().make(procedure.getName(), procedure);
     }
 
     public Boolean defined(String name) {
-        return first().thingable(name);
+        for (int i = scopes.size() - 1; i >= 0; i--) {
+            if (scopes.get(i).thingable(name.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
     }
     
     public Procedure procedure(String name) {
-        return first().thing(name).toProcedureDef();
+        for (int i = scopes.size() - 1; i >= 0; i--) {
+            if (scopes.get(i).thingable(name.toLowerCase())) {
+                return scopes.get(i).thing(name).toProcedureDef();
+            }
+        }
+        throw new FunctionNotFoundException(name);
     }
 
     public void alias(String original, String alias) {
-        if (!(first().thingable(original))) {
-            throw new FunctionNotFoundException(original);
-        }
 
-        first().make(alias, first().thing(original));
+        for (int i = scopes.size() - 1; i >= 0; i--) {
+            if (scopes.get(i).thingable(original.toLowerCase())) {
+                if (scopes.get(i).thingable(original)) {
+                    scopes.get(i).make(alias, first().thing(original));
+                }
+            }
+        }
+        throw new FunctionNotFoundException(original);
     }
     
     public String trace() {
