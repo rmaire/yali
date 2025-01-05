@@ -15,6 +15,7 @@
  */
 package ch.uprisesoft.yali.ast.node;
 
+import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
 import ch.uprisesoft.yali.runtime.procedures.FunctionType;
 import ch.uprisesoft.yali.scope.Scope;
 import java.util.ArrayList;
@@ -30,8 +31,8 @@ public class Procedure extends Node {
 
     private String name;
     private java.util.List<String> args = new ArrayList<>();
-    private BiFunction<Scope, java.util.List<Node>, Node> nativeCall;
-    private BiFunction<Scope, Node, Node> hasMoreCallback;
+    private BiFunction<Interpreter, java.util.List<Node>, Node> nativeCall;
+    private BiFunction<Interpreter, Node, Node> hasMoreCallback;
     private String source;
 
     FunctionType funType = FunctionType.YALI;
@@ -46,8 +47,8 @@ public class Procedure extends Node {
     }
     
     public Procedure(String name, 
-            BiFunction<Scope, java.util.List<Node>, Node> nativeCall, 
-            BiFunction<Scope, Node, Node> hasMoreCallback, 
+            BiFunction<Interpreter, java.util.List<Node>, Node> nativeCall,
+            BiFunction<Interpreter, Node, Node> hasMoreCallback,
             String... args) {
         this();
         this.funType = FunctionType.NATIVE;
@@ -62,11 +63,11 @@ public class Procedure extends Node {
         return this;
     }
 
-    public BiFunction<Scope, java.util.List<Node>, Node> getNativeCall() {
+    public BiFunction<Interpreter, java.util.List<Node>, Node> getNativeCall() {
         return nativeCall;
     }
     
-    public BiFunction<Scope, Node, Node> getHasMoreCallback() {
+    public BiFunction<Interpreter, Node, Node> getHasMoreCallback() {
         return hasMoreCallback;
     }
 

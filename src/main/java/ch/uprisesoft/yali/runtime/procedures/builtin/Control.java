@@ -34,11 +34,11 @@ import java.util.ArrayList;
 public class Control implements ProcedureProvider {
 
     // Only here so we don't have to strip it out as edge cases in the Reader. Does nothing.
-    public Node alias(Scope scope, java.util.List<Node> args) {
+    public Node alias(Interpreter interpreter, java.util.List<Node> args) {
         return Node.nil();
     }
 
-    public Node thing(Scope scope, java.util.List<Node> args) {
+    public Node thing(Interpreter interpreter, java.util.List<Node> args) {
 
         final String name;
         switch (args.get(0).type()) {
@@ -52,16 +52,16 @@ public class Control implements ProcedureProvider {
                 throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.SYMBOL, NodeType.QUOTE);
         }
 
-        if (!scope.callingInterpreter().env().thingable(name)) {
+        if (!interpreter.env().thingable(name)) {
             throw new VariableNotFoundException(name);
         }
 
-        Node value = scope.callingInterpreter().env().thing(name);
+        Node value = interpreter.env().thing(name);
 
         return value;
     }
 
-    public Node local(Scope scope, java.util.List<Node> args) {
+    public Node local(Interpreter interpreter, java.util.List<Node> args) {
         final String name;
 
         switch (args.get(0).type()) {
@@ -75,13 +75,13 @@ public class Control implements ProcedureProvider {
                 throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.SYMBOL, NodeType.QUOTE);
         }
 
-        scope.callingInterpreter().tracers().forEach(t -> t.local(name, scope.callingInterpreter().env()));
-        scope.callingInterpreter().env().local(name);
+        interpreter.tracers().forEach(t -> t.local(name, interpreter.env()));
+        interpreter.env().local(name);
 
         return Node.nil();
     }
 
-    public Node make(Scope scope, java.util.List<Node> args) {
+    public Node make(Interpreter interpreter, java.util.List<Node> args) {
         final Node newVar;
         final String name;
 
@@ -98,12 +98,12 @@ public class Control implements ProcedureProvider {
 
         newVar = args.get(1);
 
-        scope.callingInterpreter().env().make(name, newVar);
+        interpreter.env().make(name, newVar);
 
         return newVar;
     }
 
-    public Node localmake(Scope scope, java.util.List<Node> args) {
+    public Node localmake(Interpreter interpreter, java.util.List<Node> args) {
         Node newVar = null;
         String name = "";
 
@@ -119,15 +119,15 @@ public class Control implements ProcedureProvider {
         }
 
         newVar = args.get(1);
-        scope.callingInterpreter().env().local(name);
-        scope.callingInterpreter().env().make(name, newVar);
+        interpreter.env().local(name);
+        interpreter.env().make(name, newVar);
 
         return newVar;
     }
 
     private java.util.List<Node> ifexprsToRun;
 
-    public Node ifexpr(Scope scope, java.util.List<Node> args) {
+    public Node ifexpr(Interpreter interpreter, java.util.List<Node> args) {
         Node result = Node.none();
 
         if (ifexprsToRun == null) {
@@ -142,7 +142,7 @@ public class Control implements ProcedureProvider {
             }
 
             if (condition.toBooleanWord().getBoolean()) {
-                Node ast = scope.callingInterpreter().read(iftrue.toList());
+                Node ast = interpreter.read(iftrue.toList());
                 ifexprsToRun.addAll(ast.getChildren());
             } else {
 //                result = it.output(Node.nil());
@@ -153,13 +153,13 @@ public class Control implements ProcedureProvider {
 
         if (!ifexprsToRun.isEmpty()) {
             Call next = ifexprsToRun.remove(0).toProcedureCall();
-            scope.callingInterpreter().schedule(next);
+            interpreter.schedule(next);
         }
 
         return result;
     }
 
-    private Node ifexprFinished(Scope scope, Node result) {
+    private Node ifexprFinished(Interpreter interpreter, Node result) {
         if (ifexprsToRun.isEmpty()) {
             ifexprsToRun = null;
             return Node.bool(false);
@@ -170,7 +170,7 @@ public class Control implements ProcedureProvider {
 
     private java.util.List<Node> ifelseexprsToRun;
 
-    public Node ifelseexpr(Scope scope, java.util.List<Node> args) {
+    public Node ifelseexpr(Interpreter interpreter, java.util.List<Node> args) {
         Node result = Node.none();
 
         if (ifelseexprsToRun == null) {
@@ -185,23 +185,23 @@ public class Control implements ProcedureProvider {
             }
 
             if (condition.toBooleanWord().getBoolean()) {
-                Node ast = scope.callingInterpreter().read(iftrue.toList());
+                Node ast = interpreter.read(iftrue.toList());
                 ifelseexprsToRun.addAll(ast.getChildren());
             } else {
-                Node ast = scope.callingInterpreter().read(iffalse.toList());
+                Node ast = interpreter.read(iffalse.toList());
                 ifelseexprsToRun.addAll(ast.getChildren());
             }
         }
 
         if (!ifelseexprsToRun.isEmpty()) {
             Call next = ifelseexprsToRun.remove(0).toProcedureCall();
-            scope.callingInterpreter().schedule(next);
+            interpreter.schedule(next);
         }
 
         return result;
     }
 
-    private Node ifelseexprFinished(Scope scope, Node result) {
+    private Node ifelseexprFinished(Interpreter interpreter, Node result) {
         if (ifelseexprsToRun.isEmpty()) {
             ifelseexprsToRun = null;
             return Node.bool(false);
@@ -212,7 +212,7 @@ public class Control implements ProcedureProvider {
 
     private java.util.List<Node> repeatexprToRun;
 
-    public Node repeat(Scope scope, java.util.List<Node> args) {
+    public Node repeat(Interpreter interpreter, java.util.List<Node> args) {
         Node result = Node.none();
 
         if (repeatexprToRun == null) {
@@ -235,7 +235,7 @@ public class Control implements ProcedureProvider {
             result = Node.nil();
             
             for (int i = 0; i < idx; i++) {
-                Node ast = scope.callingInterpreter().read(block.toList());
+                Node ast = interpreter.read(block.toList());
                 repeatexprToRun.addAll(ast.getChildren());
 //                result = run(scope, block.toList());
             }
@@ -243,14 +243,14 @@ public class Control implements ProcedureProvider {
         
         if (!repeatexprToRun.isEmpty()) {
             Call next = repeatexprToRun.remove(0).toProcedureCall();
-            scope.callingInterpreter().schedule(next);
+            interpreter.schedule(next);
 //            it.schedule(it.read("print \"onemore").getChildren().get(0).toProcedureCall());
         }
 
         return result;
     }
     
-    private Node repeatexprFinished(Scope scope, Node result) {
+    private Node repeatexprFinished(Interpreter interpreter, Node result) {
         if (repeatexprToRun.isEmpty()) {
             repeatexprToRun = null;
             return Node.bool(false);
@@ -261,23 +261,23 @@ public class Control implements ProcedureProvider {
 
     private java.util.List<Node> proceduresToRun;
 
-    public Node run(Scope scope, java.util.List<Node> args) {
+    public Node run(Interpreter interpreter, java.util.List<Node> args) {
 
         Node result = Node.none();
 
         if (proceduresToRun == null) {
             proceduresToRun = new ArrayList<>();
-            Node ast = scope.callingInterpreter().read(args.get(0).toList());
+            Node ast = interpreter.read(args.get(0).toList());
             proceduresToRun.addAll(ast.getChildren());
         }
 
         Call next = proceduresToRun.remove(0).toProcedureCall();
-        scope.callingInterpreter().schedule(next);
+        interpreter.schedule(next);
 
         return result;
     }
 
-    private Node runFinished(Scope scope, Node result) {
+    private Node runFinished(Interpreter interpreter, Node result) {
         if (proceduresToRun.isEmpty()) {
             proceduresToRun = null;
             return Node.bool(false);
@@ -286,7 +286,7 @@ public class Control implements ProcedureProvider {
         }
     }
 
-    public Node output(Scope scope, java.util.List<Node> args) {
+    public Node output(Interpreter interpreter, java.util.List<Node> args) {
         return args.get(0);
     }
 
@@ -294,25 +294,25 @@ public class Control implements ProcedureProvider {
         return Node.nil();
     }
 
-    public Node pause(Scope scope, java.util.List<Node> arg) {
-        scope.callingInterpreter().pause();
+    public Node pause(Interpreter interpreter, java.util.List<Node> arg) {
+        interpreter.pause();
         return Node.nil();
     }
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("alias", (scope, val) -> this.alias(scope, val), (scope, val) -> Node.none(), "__original__", "__alias__"));
-        it.env().define(new Procedure("thing", (scope, val) -> this.thing(scope, val), (scope, val) -> Node.none(), "__name__").macro());
-        it.env().define(new Procedure("make", (scope, val) -> this.make(scope, val), (scope, val) -> Node.none(), "__name__", "__value__").macro());
-        it.env().define(new Procedure("local", (scope, val) -> this.local(scope, val), (scope, val) -> Node.none(), "__name__").macro());
-        it.env().define(new Procedure("localmake", (scope, val) -> this.localmake(scope, val), (scope, val) -> Node.none(), "__name__", "__value__").macro());
-        it.env().define(new Procedure("repeat", (scope, val) -> this.repeat(scope, val), (scope, val) -> this.repeatexprFinished(scope, val), "__control__", "__block__").macro());
-        it.env().define(new Procedure("run", (scope, val) -> this.run(scope, val), (scope, val) -> this.runFinished(scope, val), "__block__").macro());
-        it.env().define(new Procedure("output", (scope, val) -> this.output(scope, val), (scope, val) -> Node.none(), "__block__"));
-        it.env().define(new Procedure("stop", (scope, val) -> this.output(scope, val), (scope, val) -> Node.none()));
-        it.env().define(new Procedure("ifelse", (scope, val) -> this.ifelseexpr(scope, val), (scope, val) -> this.ifelseexprFinished(scope, val), "__condition__", "__iftrue__", "__iffalse__").macro());
-        it.env().define(new Procedure("if", (scope, val) -> this.ifexpr(scope, val), (scope, val) -> this.ifexprFinished(scope, val), "__condition__", "__iftrue__").macro());
-        it.env().define(new Procedure("pause", (scope, val) -> this.pause(scope, val), (scope, val) -> Node.none()).macro());
+        it.env().define(new Procedure("alias", (interpreter, val) -> this.alias(interpreter, val), (interpreter, val) -> Node.none(), "__original__", "__alias__"));
+        it.env().define(new Procedure("thing", (interpreter, val) -> this.thing(interpreter, val), (interpreter, val) -> Node.none(), "__name__").macro());
+        it.env().define(new Procedure("make", (interpreter, val) -> this.make(interpreter, val), (interpreter, val) -> Node.none(), "__name__", "__value__").macro());
+        it.env().define(new Procedure("local", (interpreter, val) -> this.local(interpreter, val), (interpreter, val) -> Node.none(), "__name__").macro());
+        it.env().define(new Procedure("localmake", (interpreter, val) -> this.localmake(interpreter, val), (interpreter, val) -> Node.none(), "__name__", "__value__").macro());
+        it.env().define(new Procedure("repeat", (interpreter, val) -> this.repeat(interpreter, val), (interpreter, val) -> this.repeatexprFinished(interpreter, val), "__control__", "__block__").macro());
+        it.env().define(new Procedure("run", (interpreter, val) -> this.run(interpreter, val), (interpreter, val) -> this.runFinished(interpreter, val), "__block__").macro());
+        it.env().define(new Procedure("output", (interpreter, val) -> this.output(interpreter, val), (interpreter, val) -> Node.none(), "__block__"));
+        it.env().define(new Procedure("stop", (interpreter, val) -> this.output(interpreter, val), (interpreter, val) -> Node.none()));
+        it.env().define(new Procedure("ifelse", (interpreter, val) -> this.ifelseexpr(interpreter, val), (interpreter, val) -> this.ifelseexprFinished(interpreter, val), "__condition__", "__iftrue__", "__iffalse__").macro());
+        it.env().define(new Procedure("if", (interpreter, val) -> this.ifexpr(interpreter, val), (interpreter, val) -> this.ifexprFinished(interpreter, val), "__condition__", "__iftrue__").macro());
+        it.env().define(new Procedure("pause", (interpreter, val) -> this.pause(interpreter, val), (interpreter, val) -> Node.none()).macro());
 
         return it;
     }

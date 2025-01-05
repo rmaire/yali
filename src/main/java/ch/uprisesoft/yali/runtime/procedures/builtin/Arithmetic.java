@@ -36,7 +36,7 @@ public class Arithmetic implements ProcedureProvider {
         return node.type().equals(NodeType.FLOAT) || node.type().equals(NodeType.INTEGER);
     }
 
-    public Node add(Scope scope, java.util.List<Node> args) {
+    public Node add(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -60,7 +60,7 @@ public class Arithmetic implements ProcedureProvider {
         return Node.none();
     }
 
-    public Node sub(Scope scope, java.util.List<Node> args) {
+    public Node sub(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -83,7 +83,7 @@ public class Arithmetic implements ProcedureProvider {
         return Node.none();
     }
 
-    public Node mul(Scope scope, java.util.List<Node> args) {
+    public Node mul(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -106,7 +106,7 @@ public class Arithmetic implements ProcedureProvider {
         return Node.none();
     }
 
-    public Node div(Scope scope, java.util.List<Node> args) {
+    public Node div(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -129,7 +129,7 @@ public class Arithmetic implements ProcedureProvider {
         return Node.none();
     }
     
-    public Node mod(Scope scope, java.util.List<Node> args) {
+    public Node mod(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -143,7 +143,7 @@ public class Arithmetic implements ProcedureProvider {
         return new IntegerWord(left.getInteger() % right.getInteger());
     }
     
-    public Node integer(Scope scope, java.util.List<Node> args) {
+    public Node integer(Interpreter interpreter, java.util.List<Node> args) {
         Word arg = (Word) args.get(0);
 
         switch (arg.type()) {
@@ -157,7 +157,7 @@ public class Arithmetic implements ProcedureProvider {
     }
     
     
-    public Node round(Scope scope, java.util.List<Node> args) {
+    public Node round(Interpreter interpreter, java.util.List<Node> args) {
         Word arg = (Word) args.get(0);
 
         switch (arg.type()) {
@@ -172,13 +172,13 @@ public class Arithmetic implements ProcedureProvider {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("add", (scope, val) -> this.add(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("mul", (scope, val) -> this.mul(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("sub", (scope, val) -> this.sub(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("div", (scope, val) -> this.div(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("mod", (scope, val) -> this.mod(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("integer", (scope, val) -> this.integer(scope, val), (scope, val) -> Node.none(), "__val__"));
-        it.env().define(new Procedure("round", (scope, val) -> this.round(scope, val), (scope, val) -> Node.none(), "__val__"));
+        it.env().define(new Procedure("add", (interpreter, val) -> this.add(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("mul", (interpreter, val) -> this.mul(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("sub", (interpreter, val) -> this.sub(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("div", (interpreter, val) -> this.div(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("mod", (interpreter, val) -> this.mod(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("integer", (interpreter, val) -> this.integer(interpreter, val), (interpreter, val) -> Node.none(), "__val__"));
+        it.env().define(new Procedure("round", (interpreter, val) -> this.round(interpreter, val), (interpreter, val) -> Node.none(), "__val__"));
 
         return it;
     }

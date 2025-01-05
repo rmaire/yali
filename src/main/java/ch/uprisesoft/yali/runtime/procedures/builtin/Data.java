@@ -38,7 +38,7 @@ import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
 public class Data implements ProcedureProvider {
 
     // Constructors
-    public Node reverse(Scope scope, java.util.List<Node> args) {
+    public Node reverse(Interpreter interpreter, java.util.List<Node> args) {
         if (args.get(0).type().equals(NodeType.LIST)) {
             List resultList = new List();
             java.util.List<Node> forwardList = args.get(0).getChildren();
@@ -56,7 +56,7 @@ public class Data implements ProcedureProvider {
         }
     }
 
-    public Node fput(Scope scope, java.util.List<Node> args) {
+    public Node fput(Interpreter interpreter, java.util.List<Node> args) {
         if (args.get(1).type().equals(NodeType.LIST)) {
             List resultList = new List();
             resultList.addChild(args.get(0));
@@ -73,7 +73,7 @@ public class Data implements ProcedureProvider {
         }
     }
 
-    public Node lput(Scope scope, java.util.List<Node> args) {
+    public Node lput(Interpreter interpreter, java.util.List<Node> args) {
         if (args.get(1).type().equals(NodeType.LIST)) {
             List resultList = new List();
             resultList.addChildren(args.get(1).getChildren());
@@ -90,7 +90,7 @@ public class Data implements ProcedureProvider {
         }
     }
 
-    public Node word(Scope scope, java.util.List<Node> args) {
+    public Node word(Interpreter interpreter, java.util.List<Node> args) {
         String concatenated = "";
 
         for (Node arg : args) {
@@ -127,7 +127,7 @@ public class Data implements ProcedureProvider {
         return concatenated;
     }
 
-    public Node sentence(Scope scope, java.util.List<Node> args) {
+    public Node sentence(Interpreter interpreter, java.util.List<Node> args) {
         List list = new List();
         list.addChildren(flatten(args));
         return list;
@@ -147,7 +147,7 @@ public class Data implements ProcedureProvider {
         return flattened;
     }
 
-    public Node list(Scope scope, java.util.List<Node> args) {
+    public Node list(Interpreter interpreter, java.util.List<Node> args) {
         List list = new List();
 
         for (Node n : args) {
@@ -161,12 +161,12 @@ public class Data implements ProcedureProvider {
         return list;
     }
 
-    public Node gensym(Scope scope, java.util.List<Node> args) {
+    public Node gensym(Interpreter interpreter, java.util.List<Node> args) {
         return new SymbolWord(UUID.randomUUID().toString().replace("-", ""));
     }
 
     // Selectors
-    public Node first(Scope scope, java.util.List<Node> args) {
+    public Node first(Interpreter interpreter, java.util.List<Node> args) {
         Node first = args.get(0);
 
         switch (args.get(0).type()) {
@@ -186,7 +186,7 @@ public class Data implements ProcedureProvider {
         return first;
     }
 
-    public Node last(Scope scope, java.util.List<Node> args) {
+    public Node last(Interpreter interpreter, java.util.List<Node> args) {
 
         Node last = args.get(0);
 
@@ -211,7 +211,7 @@ public class Data implements ProcedureProvider {
         return last;
     }
 
-    public Node butfirst(Scope scope, java.util.List<Node> args) {
+    public Node butfirst(Interpreter interpreter, java.util.List<Node> args) {
 
         Node butfirst = Node.none();
 
@@ -237,7 +237,7 @@ public class Data implements ProcedureProvider {
         return butfirst;
     }
 
-    public Node butlast(Scope scope, java.util.List<Node> args) {
+    public Node butlast(Interpreter interpreter, java.util.List<Node> args) {
 
         Node butlast = Node.none();
 
@@ -263,7 +263,7 @@ public class Data implements ProcedureProvider {
         return butlast;
     }
 
-    public Node item(Scope scope, java.util.List<Node> args) {
+    public Node item(Interpreter interpreter, java.util.List<Node> args) {
 
         Node item = Node.none();
 //        it.apply(args.get(0));
@@ -295,7 +295,7 @@ public class Data implements ProcedureProvider {
     }
 
     // Mutators
-    public Node setitem(Scope scope, java.util.List<Node> args) {
+    public Node setitem(Interpreter interpreter, java.util.List<Node> args) {
 
 //        it.apply(args.get(0));
         Node index = args.get(0);
@@ -316,7 +316,7 @@ public class Data implements ProcedureProvider {
     }
 
     // Predicates
-    public Node emptyp(Scope scope, java.util.List<Node> args) {
+    public Node emptyp(Interpreter interpreter, java.util.List<Node> args) {
 
         Node list = args.get(0);
         Node empty = new BooleanWord(Boolean.FALSE);
@@ -328,7 +328,7 @@ public class Data implements ProcedureProvider {
         return empty;
     }
 
-    public Node wordp(Scope scope, java.util.List<Node> args) {
+    public Node wordp(Interpreter interpreter, java.util.List<Node> args) {
 
         Node word = args.get(0);
         Node wordp = new BooleanWord(Boolean.FALSE);
@@ -340,7 +340,7 @@ public class Data implements ProcedureProvider {
         return wordp;
     }
 
-    public Node numberp(Scope scope, java.util.List<Node> args) {
+    public Node numberp(Interpreter interpreter, java.util.List<Node> args) {
 
         Node word = args.get(0);
         Node wordp = new BooleanWord(Boolean.FALSE);
@@ -352,7 +352,7 @@ public class Data implements ProcedureProvider {
         return wordp;
     }
 
-    public Node listp(Scope scope, java.util.List<Node> args) {
+    public Node listp(Interpreter interpreter, java.util.List<Node> args) {
 
         Node list = args.get(0);
         Node listp = new BooleanWord(Boolean.FALSE);
@@ -364,7 +364,7 @@ public class Data implements ProcedureProvider {
         return listp;
     }
 
-    public Node equalp(Scope scope, java.util.List<Node> args) {
+    public Node equalp(Interpreter interpreter, java.util.List<Node> args) {
 
         Node fst = args.get(0);
         Node snd = args.get(1);
@@ -373,7 +373,7 @@ public class Data implements ProcedureProvider {
         return equalp;
     }
 
-    public Node memberp(Scope scope, java.util.List<Node> args) {
+    public Node memberp(Interpreter interpreter, java.util.List<Node> args) {
 
         Node member = args.get(0);
         Node list = args.get(1);
@@ -389,7 +389,7 @@ public class Data implements ProcedureProvider {
                 java.util.List<Node> subArgs = new ArrayList<>();
                 subArgs.add(member);
                 subArgs.add(lm);
-                result = equalp(scope, subArgs);
+                result = equalp(interpreter, subArgs);
             }
         }
 
@@ -397,7 +397,7 @@ public class Data implements ProcedureProvider {
     }
 
     // Queries
-    public Node count(Scope scope, java.util.List<Node> args) {
+    public Node count(Interpreter interpreter, java.util.List<Node> args) {
 
         Node element = args.get(0);
 
@@ -416,7 +416,7 @@ public class Data implements ProcedureProvider {
         return Node.integer(0);
     }
 
-    public Node lowercase(Scope scope, java.util.List<Node> args) {
+    public Node lowercase(Interpreter interpreter, java.util.List<Node> args) {
 
         Node element = args.get(0);
 
@@ -425,7 +425,7 @@ public class Data implements ProcedureProvider {
             for (Node lm : element.getChildren()) {
                 java.util.List<Node> subArgs = new ArrayList<>();
                 subArgs.add(lm);
-                result.addChild(lowercase(scope, subArgs));
+                result.addChild(lowercase(interpreter, subArgs));
             }
             return result;
         }
@@ -441,7 +441,7 @@ public class Data implements ProcedureProvider {
         return element;
     }
 
-    public Node uppercase(Scope scope, java.util.List<Node> args) {
+    public Node uppercase(Interpreter interpreter, java.util.List<Node> args) {
 
         Node element = args.get(0);
 
@@ -450,7 +450,7 @@ public class Data implements ProcedureProvider {
             for (Node lm : element.getChildren()) {
                 java.util.List<Node> subArgs = new ArrayList<>();
                 subArgs.add(lm);
-                result.addChild(uppercase(scope, subArgs));
+                result.addChild(uppercase(interpreter, subArgs));
             }
             return result;
         }
@@ -468,28 +468,28 @@ public class Data implements ProcedureProvider {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("uppercase", (scope, val) -> this.uppercase(scope, val), (scope, val) -> Node.none(), "__element__"));
-        it.env().define(new Procedure("lowercase", (scope, val) -> this.lowercase(scope, val), (scope, val) -> Node.none(), "__element__"));
-        it.env().define(new Procedure("count", (scope, val) -> this.count(scope, val), (scope, val) -> Node.none(), "__element__"));
-        it.env().define(new Procedure("equal?", (scope, val) -> this.equalp(scope, val), (scope, val) -> Node.none(), "__fst", "__snd__"));
-        it.env().define(new Procedure("member?", (scope, val) -> this.memberp(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("list?", (scope, val) -> this.listp(scope, val), (scope, val) -> Node.none(), "__list__"));
-        it.env().define(new Procedure("number?", (scope, val) -> this.numberp(scope, val), (scope, val) -> Node.none(), "__number__"));
-        it.env().define(new Procedure("word?", (scope, val) -> this.wordp(scope, val), (scope, val) -> Node.none(), "__word__"));
-        it.env().define(new Procedure("empty?", (scope, val) -> this.emptyp(scope, val), (scope, val) -> Node.none(), "__list__"));
-        it.env().define(new Procedure("setitem", (scope, val) -> this.setitem(scope, val), (scope, val) -> Node.none(), "__index__", "__list__", "__newval__"));
-        it.env().define(new Procedure("item", (scope, val) -> this.item(scope, val), (scope, val) -> Node.none(), "__index__", "__listorword__"));
-        it.env().define(new Procedure("butlast", (scope, val) -> this.butlast(scope, val), (scope, val) -> Node.none(), "__listorword__"));
-        it.env().define(new Procedure("butfirst", (scope, val) -> this.butfirst(scope, val), (scope, val) -> Node.none(), "__listorword__"));
-        it.env().define(new Procedure("last", (scope, val) -> this.last(scope, val), (scope, val) -> Node.none(), "__listorword__"));
-        it.env().define(new Procedure("first", (scope, val) -> this.first(scope, val), (scope, val) -> Node.none(), "__listorword__"));
-        it.env().define(new Procedure("reverse", (scope, val) -> this.reverse(scope, val), (scope, val) -> Node.none(), "__list__"));
-        it.env().define(new Procedure("fput", (scope, val) -> this.fput(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("lput", (scope, val) -> this.lput(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("word", (scope, val) -> this.word(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("list", (scope, val) -> this.list(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("sentence", (scope, val) -> this.sentence(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("gensym", (scope, val) -> this.gensym(scope, val), (scope, val) -> Node.none()));
+        it.env().define(new Procedure("uppercase", (interpreter, val) -> this.uppercase(interpreter, val), (interpreter, val) -> Node.none(), "__element__"));
+        it.env().define(new Procedure("lowercase", (interpreter, val) -> this.lowercase(interpreter, val), (interpreter, val) -> Node.none(), "__element__"));
+        it.env().define(new Procedure("count", (interpreter, val) -> this.count(interpreter, val), (interpreter, val) -> Node.none(), "__element__"));
+        it.env().define(new Procedure("equal?", (interpreter, val) -> this.equalp(interpreter, val), (interpreter, val) -> Node.none(), "__fst", "__snd__"));
+        it.env().define(new Procedure("member?", (interpreter, val) -> this.memberp(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("list?", (interpreter, val) -> this.listp(interpreter, val), (interpreter, val) -> Node.none(), "__list__"));
+        it.env().define(new Procedure("number?", (interpreter, val) -> this.numberp(interpreter, val), (interpreter, val) -> Node.none(), "__number__"));
+        it.env().define(new Procedure("word?", (interpreter, val) -> this.wordp(interpreter, val), (interpreter, val) -> Node.none(), "__word__"));
+        it.env().define(new Procedure("empty?", (interpreter, val) -> this.emptyp(interpreter, val), (interpreter, val) -> Node.none(), "__list__"));
+        it.env().define(new Procedure("setitem", (interpreter, val) -> this.setitem(interpreter, val), (interpreter, val) -> Node.none(), "__index__", "__list__", "__newval__"));
+        it.env().define(new Procedure("item", (interpreter, val) -> this.item(interpreter, val), (interpreter, val) -> Node.none(), "__index__", "__listorword__"));
+        it.env().define(new Procedure("butlast", (interpreter, val) -> this.butlast(interpreter, val), (interpreter, val) -> Node.none(), "__listorword__"));
+        it.env().define(new Procedure("butfirst", (interpreter, val) -> this.butfirst(interpreter, val), (interpreter, val) -> Node.none(), "__listorword__"));
+        it.env().define(new Procedure("last", (interpreter, val) -> this.last(interpreter, val), (interpreter, val) -> Node.none(), "__listorword__"));
+        it.env().define(new Procedure("first", (interpreter, val) -> this.first(interpreter, val), (interpreter, val) -> Node.none(), "__listorword__"));
+        it.env().define(new Procedure("reverse", (interpreter, val) -> this.reverse(interpreter, val), (interpreter, val) -> Node.none(), "__list__"));
+        it.env().define(new Procedure("fput", (interpreter, val) -> this.fput(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("lput", (interpreter, val) -> this.lput(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("word", (interpreter, val) -> this.word(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("list", (interpreter, val) -> this.list(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("sentence", (interpreter, val) -> this.sentence(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("gensym", (interpreter, val) -> this.gensym(interpreter, val), (interpreter, val) -> Node.none()));
 
         return it;
     }

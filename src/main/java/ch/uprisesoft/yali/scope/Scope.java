@@ -36,7 +36,6 @@ public class Scope {
 
     private String scopeName = "";
     private Map<String, Node> members = new HashMap<>();
-    private Interpreter callingInterpreter;
 
     public Scope(String scopeName) {
         this.scopeName = scopeName;
@@ -44,14 +43,6 @@ public class Scope {
 
     public String name() {
         return scopeName;
-    }
-
-    public Interpreter callingInterpreter() {
-        return callingInterpreter;
-    }
-
-    public void callingInterpreter(Interpreter callingInterpreter) {
-        this.callingInterpreter = callingInterpreter;
     }
 
     /**
@@ -62,8 +53,8 @@ public class Scope {
      * @return the value defined with the variable name
      */
     public Node thing(String name) {
-        if (members.containsKey(name.toLowerCase())) {
-            return members.get(name.toLowerCase());
+        if (members.containsKey(name)) {
+            return members.get(name);
         } 
 
         // Shouldn't happen

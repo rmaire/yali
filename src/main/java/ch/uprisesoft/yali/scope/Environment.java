@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2020 Uprise Software.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,29 +23,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *A datastructure to manage the scopes in a running program. Yali is dynamic 
- * scoped. This means that variable resolution searches up the calling chain, and 
+ *A datastructure to manage the scopes in a running program. Yali is dynamic
+ * scoped. This means that variable resolution searches up the calling chain, and
  * not the lexical (written) definition of functions as most programming languages
  * do. This has the advantage that nested calls behave like a kind of closures and
  * enable some nice tricks with macros and global variables. It is also a little
- * bit more intuitive for children and absolute beginners (the target demography 
- * for yali). 
+ * bit more intuitive for children and absolute beginners (the target demography
+ * for yali).
  * Nevertheless, it irks professional programmers because the scoping isn't as clear
  * while reading code as with lexical scoping. Also, it is prone to overwrite
  * variables in global scope.
- * 
+ *
  * @author uprisesoft@gmail.com
  */
 public class Environment {
-    
+
     private List<Tracer> tracers = new ArrayList<>();
 
     private List<Scope> scopes = new ArrayList<>();
-    
+
     public void addTracer(Tracer tracer) {
         tracers.add(tracer);
     }
-    
+
     public Scope peek() {
         return scopes.get(scopes.size() - 1);
     }
@@ -58,13 +58,13 @@ public class Environment {
     public Scope pop() {
         return scopes.remove(scopes.size() - 1);
     }
-    
+
     public Scope first() {
         return scopes.get(0);
     }
 
     public void first(Scope first) {
-         scopes.set(0, first);
+        scopes.set(0, first);
     }
 
 
@@ -81,7 +81,7 @@ public class Environment {
                 return;
             }
         }
-        
+
         scopes.get(0).make(name.toLowerCase(), value);
     }
 
@@ -91,7 +91,7 @@ public class Environment {
     }
 
     public Node thing(String name) {
-        
+
         for (int i = scopes.size() - 1; i >= 0; i--) {
             if (scopes.get(i).thingable(name.toLowerCase())) {
                 final Node ret = scopes.get(i).thing(name.toLowerCase());
@@ -113,28 +113,32 @@ public class Environment {
 
         return false;
     }
-    
+
     /**
      * Procedures
      */
-    
+
     public void define(Procedure procedure) {
         peek().make(procedure.getName(), procedure);
     }
 
     public Boolean defined(String name) {
-        for (int i = scopes.size() - 1; i >= 0; i--) {
-            if (scopes.get(i).thingable(name.toLowerCase())) {
+        String lowerName = name.toLowerCase();
+        int size =  scopes.size() - 1;
+        for (int i = size; i >= 0; i--) {
+            if (scopes.get(i).thingable(lowerName)) {
                 return true;
             }
         }
         return false;
     }
-    
+
     public Procedure procedure(String name) {
-        for (int i = scopes.size() - 1; i >= 0; i--) {
-            if (scopes.get(i).thingable(name.toLowerCase())) {
-                return scopes.get(i).thing(name).toProcedureDef();
+        String lowerName = name.toLowerCase();
+        int size =  scopes.size() - 1;
+        for (int i = size; i >= 0; i--) {
+            if (scopes.get(i).thingable(lowerName)) {
+                return scopes.get(i).thing(lowerName).toProcedureDef();
             }
         }
         throw new FunctionNotFoundException(name);
@@ -151,10 +155,10 @@ public class Environment {
         }
         throw new FunctionNotFoundException(original);
     }
-    
+
     public String trace() {
         StringBuilder sb = new StringBuilder();
-        
+
         for(Scope s: scopes) {
             sb.append(s.name()).append("\n");
         }

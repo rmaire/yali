@@ -37,16 +37,16 @@ public class Template implements ProcedureProvider {
     private boolean mapIsList = false;
     private boolean mapRunning = false;
 
-    public Node map(Scope scope, java.util.List<Node> args) {
-        if (scope.thingable("__last_map_result__")) {
-            Node res = scope.thing("__last_map_result__");
+    public Node map(Interpreter interpreter, java.util.List<Node> args) {
+        if (interpreter.env().peek().thingable("__last_map_result__")) {
+            Node res = interpreter.env().peek().thing("__last_map_result__");
             mapResults.add(res);
-            scope.unmake("__last_map_result__");
+            interpreter.env().peek().unmake("__last_map_result__");
         }
 
         if (mapRunning && mapValues.isEmpty()) {
             mapRunning = false;
-            return mapResult(scope.callingInterpreter());
+            return mapResult(interpreter);
         }
 
         if (!mapRunning) {
@@ -82,13 +82,13 @@ public class Template implements ProcedureProvider {
         }
 
         String realizedString = Node.list(realizedValues).toString().substring(1, Node.list(realizedValues).toString().length() - 1);
-        Call c = scope.callingInterpreter().read("make \"__last_map_result__ " + realizedString).getChildren().get(0).toProcedureCall();
-        scope.callingInterpreter().schedule(c);
+        Call c = interpreter.read("make \"__last_map_result__ " + realizedString).getChildren().get(0).toProcedureCall();
+        interpreter.schedule(c);
 
-        return mapResult(scope.callingInterpreter());
+        return mapResult(interpreter);
     }
 
-    public Node mapFinished(Scope scope, Node result) {
+    public Node mapFinished(Interpreter interpreter, Node result) {
         if (!mapRunning) {
             mapResults.clear();
             mapTemplate = Node.none();
@@ -118,19 +118,19 @@ public class Template implements ProcedureProvider {
     private boolean filterIsList = false;
     private boolean filterRunning = false;
 
-    public Node filter(Scope scope, java.util.List<Node> args) {
-        if (scope.thingable("__last_filter_result__")) {
-            Node res = scope.thing("__last_filter_result__");
+    public Node filter(Interpreter interpreter, java.util.List<Node> args) {
+        if (interpreter.env().peek().thingable("__last_filter_result__")) {
+            Node res = interpreter.env().peek().thing("__last_filter_result__");
             if (res.type().equals(NodeType.BOOLEAN) && res.toBooleanWord().getBoolean() == true) {
                 filterResults.add(filterValues.get(0));
             }
             filterValues.remove(0);
-            scope.unmake("__last_filter_result__");
+            interpreter.env().peek().unmake("__last_filter_result__");
         }
 
         if (filterRunning && filterValues.isEmpty()) {
             filterRunning = false;
-            return filterResult(scope.callingInterpreter());
+            return filterResult(interpreter);
         }
 
         if (!filterRunning) {
@@ -166,13 +166,13 @@ public class Template implements ProcedureProvider {
         }
 
         String realizedString = Node.list(realizedValues).toString().substring(1, Node.list(realizedValues).toString().length() - 1);
-        Call c = scope.callingInterpreter().read("make \"__last_filter_result__ " + realizedString).getChildren().get(0).toProcedureCall();
-        scope.callingInterpreter().schedule(c);
+        Call c = interpreter.read("make \"__last_filter_result__ " + realizedString).getChildren().get(0).toProcedureCall();
+        interpreter.schedule(c);
 
-        return filterResult(scope.callingInterpreter());
+        return filterResult(interpreter);
     }
 
-    public Node filterFinished(Scope scope, Node result) {
+    public Node filterFinished(Interpreter interpreter, Node result) {
         if (!filterRunning) {
             filterResults.clear();
             filterTemplate = Node.none();
@@ -268,8 +268,8 @@ public class Template implements ProcedureProvider {
     @Override
     public Interpreter registerProcedures(Interpreter it) {
 
-        it.env().define(new Procedure("map", (scope, val) -> this.map(scope, val), (scope, val) -> this.mapFinished(scope, val), "__template__", "__values__").macro());
-        it.env().define(new Procedure("filter", (scope, val) -> this.filter(scope, val), (scope, val) -> this.filterFinished(scope, val), "__template__", "__values__").macro());
+        it.env().define(new Procedure("map", (interpreter, val) -> this.map(interpreter, val), (interpreter, val) -> this.mapFinished(interpreter, val), "__template__", "__values__").macro());
+        it.env().define(new Procedure("filter", (interpreter, val) -> this.filter(interpreter, val), (interpreter, val) -> this.filterFinished(interpreter, val), "__template__", "__values__").macro());
 //        it.env().define(new Procedure("find", (scope, val) -> this.find(scope, val), (scope, val) -> Node.none(), "__template__", "__values__"));
 
         return it;

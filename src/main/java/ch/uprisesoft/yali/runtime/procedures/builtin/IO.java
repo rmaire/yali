@@ -39,7 +39,7 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
     private java.util.List<OutputObserver> observers = new ArrayList<>();
     private InputGenerator generator;
 
-    public Node print(Scope scope, java.util.List<Node> args) {
+    public Node print(Interpreter interpreter, java.util.List<Node> args) {
         java.util.List<Node> concreteArgs = new ArrayList<>();
         
         List returnValue = new List();
@@ -59,53 +59,53 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
         }
         
         java.util.List<String> stringifiedArgs = new ArrayList<>();
-        stringifiedArgs.addAll(scope.callingInterpreter().stringify(concreteArgs));
+        stringifiedArgs.addAll(interpreter.stringify(concreteArgs));
 
         inform(String.join(" ", stringifiedArgs) + "\n");
 
         return returnValue;
     }
 
-    public Node show(Scope scope, java.util.List<Node> args) {
+    public Node show(Interpreter interpreter, java.util.List<Node> args) {
         java.util.List<String> stringifiedArgs = new ArrayList<>();
-        stringifiedArgs.addAll(scope.callingInterpreter().stringify(args));
+        stringifiedArgs.addAll(interpreter.stringify(args));
 
         inform(String.join(" ", stringifiedArgs) + "\n");
         return Node.nil();
     }
 
-    public Node type(Scope scope, java.util.List<Node> args) {
+    public Node type(Interpreter interpreter, java.util.List<Node> args) {
         java.util.List<String> stringifiedArgs = new ArrayList<>();
-        stringifiedArgs.addAll(scope.callingInterpreter().stringify(args));
+        stringifiedArgs.addAll(interpreter.stringify(args));
 
         inform(String.join(" ", stringifiedArgs));
         return Node.nil();
     }
 
-    public Node readword(Scope scope, java.util.List<Node> args) {
+    public Node readword(Interpreter interpreter, java.util.List<Node> args) {
         QuotedWord result = new QuotedWord(requestLine());
         return result;
     }
 
-    public Node readlist(Scope scope, java.util.List<Node> args) {
+    public Node readlist(Interpreter interpreter, java.util.List<Node> args) {
 
         StringBuffer list = new StringBuffer();
         list.append("[");
         list.append(requestLine());
         list.append("]");
 
-        List result = (List) scope.callingInterpreter().read(list.toString());
+        List result = (List) interpreter.read(list.toString());
 
         return result;
     }
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("readword", (scope, val) -> this.readword(scope, val), (scope, val) -> Node.none()));
-        it.env().define(new Procedure("readlist", (scope, val) -> this.readlist(scope, val), (scope, val) -> Node.none()));
-        it.env().define(new Procedure("show", (scope, val) -> this.show(scope, val), (scope, val) -> Node.none(), "__output__"));
-        it.env().define(new Procedure("type", (scope, val) -> this.type(scope, val), (scope, val) -> Node.none(), "__output__"));
-        it.env().define(new Procedure("print", (scope, val) -> this.print(scope, val), (scope, val) -> Node.none(), "__output__"));
+        it.env().define(new Procedure("readword", (interpreter, val) -> this.readword(interpreter, val), (interpreter, val) -> Node.none()));
+        it.env().define(new Procedure("readlist", (interpreter, val) -> this.readlist(interpreter, val), (interpreter, val) -> Node.none()));
+        it.env().define(new Procedure("show", (interpreter, val) -> this.show(interpreter, val), (interpreter, val) -> Node.none(), "__output__"));
+        it.env().define(new Procedure("type", (interpreter, val) -> this.type(interpreter, val), (interpreter, val) -> Node.none(), "__output__"));
+        it.env().define(new Procedure("print", (interpreter, val) -> this.print(interpreter, val), (interpreter, val) -> Node.none(), "__output__"));
 
         return it;
     }

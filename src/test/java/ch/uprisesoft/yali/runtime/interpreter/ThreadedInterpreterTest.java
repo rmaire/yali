@@ -56,7 +56,6 @@ public class ThreadedInterpreterTest {
 
             @Override
             public void inform(String output) {
-//                System.out.println(output);
                 outputs.add(output);
             }
         };
@@ -77,7 +76,6 @@ public class ThreadedInterpreterTest {
 
         it = new ThreadedInterpreter(new ObjectMother().getInterpreter(oo, ig));
         it.loadStdLib(oo, ig);
-//        it = om.getInterpreter();
     }
 
     @Test
@@ -134,29 +132,6 @@ public class ThreadedInterpreterTest {
         assertThat(outputs.get(0), is("first\n"));
         assertThat(outputs.get(1), is("yes\n"));
     }
-
-//    @Test
-//    public void testReset() throws InterruptedException {
-//        String badInput = "Blabla\n";
-//
-//        try {
-//            Node res = it.run(it.read(badInput));
-//        } catch (NodeTypeException nte) {
-//            assertThat(nte.getExpected().get(0), is(NodeType.PROCCALL));
-//            assertThat(nte.getReceived(), is(NodeType.SYMBOL));
-//        }
-//
-//        String goodInput = "print \"Blabla\n";
-//
-//        it.reset();
-//        Node res = it.run(it.read(goodInput));
-//
-//        while(!it.finished()) {Thread.sleep(10);}
-//
-//        assertThat(outputs.size(), is(1));
-//        assertThat(outputs.get(0), is("Blabla\n"));
-//
-//    }
 
     @Test
     public void testThreadedRecursion() throws InterruptedException {

@@ -77,12 +77,12 @@ public class ObjectMother {
 		UnthreadedInterpreter fork = new UnthreadedInterpreter();
 
 		fork.env().first(original.env().first());
-		//fork.loadStdLib(oo, ig);
+		/*fork.loadStdLib(oo, ig);
 
-		//MockTurtleManager mtm = new MockTurtleManager();
-		//mtm.registerProcedures(fork);
+		MockTurtleManager mtm = new MockTurtleManager();
+		mtm.registerProcedures(fork);
 
-		Parser p = new Parser(fork);
+		Parser p = new Parser(fork);*/
 
 		return fork;
 	}

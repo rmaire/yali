@@ -31,7 +31,7 @@ import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
  */
 public class Logic implements ProcedureProvider {
 
-    public Node equal(Scope scope, java.util.List<Node> args) {
+    public Node equal(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -54,8 +54,8 @@ public class Logic implements ProcedureProvider {
         return Word.bool(Boolean.FALSE);
     }
 
-    public Node inequal(Scope scope, java.util.List<Node> args) {
-        Node result = equal(scope, args);
+    public Node inequal(Interpreter interpreter, java.util.List<Node> args) {
+        Node result = equal(interpreter, args);
         if (result.toBooleanWord().getBoolean()) {
             return new BooleanWord(Boolean.FALSE);
         } else {
@@ -63,7 +63,7 @@ public class Logic implements ProcedureProvider {
         }
     }
 
-    public Node greater(Scope scope, java.util.List<Node> args) {
+    public Node greater(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
         
@@ -90,7 +90,7 @@ public class Logic implements ProcedureProvider {
         return result;
     }
 
-    public Node less(Scope scope, java.util.List<Node> args) {
+    public Node less(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -109,7 +109,7 @@ public class Logic implements ProcedureProvider {
         return result;
     }
 
-    public Node greaterorequal(Scope scope, java.util.List<Node> args) {
+    public Node greaterorequal(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -126,7 +126,7 @@ public class Logic implements ProcedureProvider {
         return Word.bool(Boolean.FALSE);
     }
 
-    public Node lessorequal(Scope scope, java.util.List<Node> args) {
+    public Node lessorequal(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -145,12 +145,12 @@ public class Logic implements ProcedureProvider {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("equal?", (scope, val) -> this.equal(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("notequal?", (scope, val) -> this.inequal(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("less?", (scope, val) -> this.less(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("greater?", (scope, val) -> this.greater(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("greaterequal?", (scope, val) -> this.greaterorequal(scope, val), (scope, val) -> Node.none(), "__fst", "__snd__"));
-        it.env().define(new Procedure("lessequal?", (scope, val) -> this.lessorequal(scope, val), (scope, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("equal?", (interpreter, val) -> this.equal(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("notequal?", (interpreter, val) -> this.inequal(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("less?", (interpreter, val) -> this.less(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("greater?", (interpreter, val) -> this.greater(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("greaterequal?", (interpreter, val) -> this.greaterorequal(interpreter, val), (interpreter, val) -> Node.none(), "__fst", "__snd__"));
+        it.env().define(new Procedure("lessequal?", (interpreter, val) -> this.lessorequal(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
 
         return it;
     }
