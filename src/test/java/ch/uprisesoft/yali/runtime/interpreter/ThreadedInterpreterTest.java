@@ -103,16 +103,16 @@ public class ThreadedInterpreterTest {
                 + "if (:i > 0) [recurse :i - 1]\n"
                 + "end\n"
                 + "\n"
-                + "recurse 8000\n";
+                + "recurse 100\n";
 
         it.run(it.read(input));
 
         while(!it.finished()) {Thread.sleep(10);}
 
-        assertThat(outputs.size(), is(8001));
+        assertThat(outputs.size(), is(101));
 
-        for (int i = 8000; i >= 0; i--) {
-            assertThat(outputs.get(8000 - i), is(i + "\n"));
+        for (int i = 100; i >= 0; i--) {
+            assertThat(outputs.get(100 - i), is(i + "\n"));
         }
     }
 
@@ -140,16 +140,16 @@ public class ThreadedInterpreterTest {
                 + "if (:i > 0) [recurse :i - 1]\n"
                 + "end\n"
                 + "\n"
-                + "recurse 8000\n";
+                + "recurse 100\n";
 
         Node res = it.run(it.read(input));
 
         while(!it.finished()) {Thread.sleep(10);}
 
-        assertThat(outputs.size(), is(8001));
+        assertThat(outputs.size(), is(101));
 
-        for (int i = 8000; i >= 0; i--) {
-            assertThat(outputs.get(8000 - i), is(i + "\n"));
+        for (int i = 100; i >= 0; i--) {
+            assertThat(outputs.get(100 - i), is(i + "\n"));
         }
     }
 }

@@ -40,15 +40,11 @@ public class PrintingTracer implements Tracer {
     @Override
     public void callPrimitive(String name, List<Node> args, Environment env) {
         System.out.println(lpad() + "Calling primitive Procedure " + name + ": " + args.toString());
-//        System.out.println("Trace:");
-//        System.out.println(env.trace());
     }
 
     @Override
     public void call(String name, List<Node> args, Environment env) {
         System.out.println(lpad() + "Calling Procedure " + name + ": " + args.toString());
-//        System.out.println("Trace:");
-//        System.out.println(env.trace());
     }
 
     @Override

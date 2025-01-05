@@ -34,7 +34,6 @@ public class ObjectMother {
 
 			@Override
 			public void inform(String output) {
-				System.out.println(output);
 			}
 		};
 

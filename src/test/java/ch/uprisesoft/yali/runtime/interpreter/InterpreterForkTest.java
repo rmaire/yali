@@ -17,34 +17,26 @@ package ch.uprisesoft.yali.runtime.interpreter;
 
 import ch.uprisesoft.yali.ast.node.Node;
 import ch.uprisesoft.yali.helper.ObjectMother;
-import ch.uprisesoft.yali.repl.PrintingTracer;
 import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
-import ch.uprisesoft.yali.scope.Scope;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  *
  * @author uprisesoft@gmail.com
  */
-//@Disabled
 public class InterpreterForkTest {
 
     private java.util.List<String> outputs;
 
     private UnthreadedInterpreter it;
     private UnthreadedInterpreter fork;
-
-    private Tracer tracer;
-    private Tracer tracer2;
 
     private OutputObserver oo;
     private InputGenerator ig;
@@ -58,7 +50,6 @@ public class InterpreterForkTest {
         outputs = new ArrayList<>();
 
         oo = output -> {
-            System.out.println(output);
 			outputs.add(output);
 		};
 
@@ -76,12 +67,7 @@ public class InterpreterForkTest {
         };
 
         it = new ObjectMother().getInterpreter(oo, ig);
-        tracer = new PrintingTracer(it, "i");
-        it.addTracer(tracer);
-
         fork = new ObjectMother().fork(it, oo, ig);
-        tracer2 = new PrintingTracer(fork, "f");
-        fork.addTracer(tracer2);
     }
 
     @Test
@@ -155,15 +141,10 @@ public class InterpreterForkTest {
 
         it.run(it.read(input));
 
-        System.out.println(fork.env().thing("testit").toString());
-        System.out.println(fork.env().toString());
-
         input = "testit \"Hello2\n";
 
         Node prog = fork.read(input);
         Node res = fork.run(prog);
-
-        System.out.println(res.toString());
 
         assertThat(outputs.size(), is(2));
         assertThat(outputs.get(0), is("Hello1\n"));
