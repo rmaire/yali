@@ -76,12 +76,6 @@ public class ObjectMother {
 		UnthreadedInterpreter fork = new UnthreadedInterpreter();
 
 		fork.env().first(original.env().first());
-		/*fork.loadStdLib(oo, ig);
-
-		MockTurtleManager mtm = new MockTurtleManager();
-		mtm.registerProcedures(fork);
-
-		Parser p = new Parser(fork);*/
 
 		return fork;
 	}

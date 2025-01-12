@@ -19,6 +19,8 @@ import ch.uprisesoft.yali.ast.node.Node;
 import ch.uprisesoft.yali.helper.ObjectMother;
 import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
+import ch.uprisesoft.yali.runtime.procedures.builtin.MockTurtleManager;
+import ch.uprisesoft.yali.scope.Scope;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -148,5 +150,30 @@ public class InterpreterForkTest {
 
         assertThat(outputs.size(), is(2));
         assertThat(outputs.get(0), is("Hello1\n"));
+    }
+
+    @Test
+    public void testScopeDefinitions() {
+        it.loadStdLib(oo, ig);
+        MockTurtleManager mtm = new MockTurtleManager();
+        mtm.registerProcedures(it);
+        fork.env().push(new Scope("fork"));
+
+        String input1 = "to testit\n"
+                + "print \"Hello\n"
+                + "end\n";
+        it.run(it.read(input1));
+
+        String input2 = "to testit\n"
+                + "print \"World!\n"
+                + "end\n";
+        fork.run(fork.read(input2));
+
+        fork.run(fork.read("testit"));
+        it.run(it.read("testit"));
+
+        assertThat(outputs.size(), is(2));
+        assertThat(outputs.get(0), is("World!\n"));
+        assertThat(outputs.get(1), is("Hello\n"));
     }
 }
