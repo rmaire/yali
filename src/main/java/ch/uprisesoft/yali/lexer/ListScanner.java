@@ -17,7 +17,6 @@ package ch.uprisesoft.yali.lexer;
 
 import static ch.uprisesoft.yali.lexer.TokenType.LEFT_BRACKET;
 import static ch.uprisesoft.yali.lexer.TokenType.RIGHT_BRACKET;
-import java.util.List;
 
 /**
  *
@@ -28,12 +27,12 @@ public class ListScanner extends Scanner {
     private int listDepth = 1;
     
 
-    public ListScanner(Lexer context, String source) {
-        super(context, source);
+    public ListScanner(Lexer lexer, String source) {
+        super(lexer, source);
     }
 
-    protected ListScanner(Lexer context, String source, List<Token> tokens, int start, int current, int line, int linePos, Token funStart, Token funEnd, int parenDepth,int braceDepth) {
-        super(context, source, tokens, start, current, line, linePos, funStart, funEnd, parenDepth, braceDepth);
+    protected ListScanner(Lexer lexer, ScannerContext scannerContext) {
+        super(lexer, scannerContext);
     }
 
     @Override
@@ -48,7 +47,7 @@ public class ListScanner extends Scanner {
                 addToken(RIGHT_BRACKET);
                 listDepth--;
                 if (listDepth < 1) {
-                    context.setScanner(new BaseScanner(context, source, tokens, start, current, line, linePos, funStart, funEnd, parenDepth, braceDepth));
+                    lexer.setScanner(new BaseScanner(lexer, context));
                 }
                 break;
             case ' ':

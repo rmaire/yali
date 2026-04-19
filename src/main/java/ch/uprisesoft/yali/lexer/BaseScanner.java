@@ -35,7 +35,6 @@ import static ch.uprisesoft.yali.lexer.TokenType.RIGHT_BRACE;
 import static ch.uprisesoft.yali.lexer.TokenType.RIGHT_PAREN;
 import static ch.uprisesoft.yali.lexer.TokenType.SLASH;
 import static ch.uprisesoft.yali.lexer.TokenType.STAR;
-import java.util.List;
 
 /**
  *
@@ -43,12 +42,12 @@ import java.util.List;
  */
 public class BaseScanner extends Scanner {
 
-    public BaseScanner(Lexer context, String source) {
-        super(context, source);
+    public BaseScanner(Lexer lexer, String source) {
+        super(lexer, source);
     }
 
-    protected BaseScanner(Lexer context, String source, List<Token> tokens, int start, int current, int line, int linePos, Token funStart, Token funEnd, int parenDepth,int braceDepth) {
-        super(context, source, tokens, start, current, line, linePos, funStart, funEnd, parenDepth, braceDepth);
+    protected BaseScanner(Lexer lexer, ScannerContext scannerContext) {
+        super(lexer, scannerContext);
     }
 
     @Override
@@ -56,30 +55,30 @@ public class BaseScanner extends Scanner {
         char c = advance();
         switch (c) {
             case '(':
-                parenDepth++;
+                context.parenDepth++;
                 addToken(LEFT_PAREN);
                 break;
             case ')':
-                if (parenDepth < 1) {
-                    throw new UnexpectedCharacterException(String.valueOf(c), line, linePos);
+                if (context.parenDepth < 1) {
+                    throw new UnexpectedCharacterException(String.valueOf(c), context.line, context.linePos);
                 }
-                parenDepth--;
+                context.parenDepth--;
                 addToken(RIGHT_PAREN);
                 break;
             case '{':
-                braceDepth++;
+                context.braceDepth++;
                 addToken(LEFT_BRACE);
                 break;
             case '}':
-                if (braceDepth < 1) {
-                    throw new UnexpectedCharacterException(String.valueOf(c), line, linePos);
+                if (context.braceDepth < 1) {
+                    throw new UnexpectedCharacterException(String.valueOf(c), context.line, context.linePos);
                 }
-                braceDepth--;
+                context.braceDepth--;
                 addToken(RIGHT_BRACE);
                 break;
             case '[':
                 addToken(LEFT_BRACKET);
-                context.setScanner(new ListScanner(context, source, tokens, start, current, line, linePos, funStart, funEnd, parenDepth, braceDepth));
+                lexer.setScanner(new ListScanner(lexer, context));
                 break;
             case '-':
                 if (isDigit(peek())) {
@@ -139,7 +138,7 @@ public class BaseScanner extends Scanner {
                 } else if (isAlpha(c)) {
                     symbol();
                 } else {
-                    throw new UnexpectedCharacterException(String.valueOf(c), line, linePos);
+                    throw new UnexpectedCharacterException(String.valueOf(c), context.line, context.linePos);
                 }
                 break;
         }
@@ -168,7 +167,7 @@ public class BaseScanner extends Scanner {
             advance();
         }
 
-        String text = source.substring(start, current);
+        String text = context.source.substring(context.start, context.current);
 
         // Symbol is the default type
         TokenType type = TokenType.SYMBOL;

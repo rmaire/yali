@@ -17,7 +17,6 @@ package ch.uprisesoft.yali.lexer;
 
 import static ch.uprisesoft.yali.lexer.TokenType.EOF;
 import static ch.uprisesoft.yali.lexer.TokenType.NUMBER;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,51 +25,31 @@ import java.util.List;
  */
 public abstract class Scanner {
 
-    protected Lexer context;
+    protected final Lexer lexer;
+    protected final ScannerContext context;
 
-    protected String source;
-    protected List<Token> tokens = new ArrayList<>();
-
-    protected int start = 0;
-    protected int current = 0;
-    protected int line = 1;
-    protected int linePos = 0;
-    
-    protected int parenDepth = 0;
-    protected int braceDepth = 0;
-    protected int bracketDepth = 0;
-
-    protected Token funStart;
-    protected Token funEnd;
-
-    public Scanner(Lexer context, String source) {
-        this.context = context;
-        this.source = source;
+    public Scanner(Lexer lexer, String source) {
+        this(lexer, new ScannerContext(source));
     }
 
-    protected Scanner(Lexer context, String source, List<Token> tokens, int start, int current, int line, int linePos, Token funStart, Token funEnd, int parenDepth, int braceDepth) {
+    protected Scanner(Lexer lexer, ScannerContext context) {
+        this.lexer = lexer;
         this.context = context;
-        this.source = source;
-        this.tokens = tokens;
-        this.start = start;
-        this.current = current;
-        this.line = line;
-        this.linePos = linePos;
-        this.funStart = funStart;
-        this.funEnd = funEnd;
-        this.parenDepth = parenDepth;
-        this.braceDepth = braceDepth;
     }
 
     public List<Token> getTokens() {
-        return tokens;
+        return context.tokens;
+    }
+
+    protected ScannerContext getContext() {
+        return context;
     }
 
     public boolean isAtEnd() {
-        start = current;
+        context.start = context.current;
         boolean end = testEnd();
         if (end == true) {
-            tokens.add(new Token(EOF, "", line, linePos, current));
+            context.tokens.add(new Token(EOF, "", context.line, context.linePos, context.current));
         }
         return end;
     }
@@ -78,13 +57,13 @@ public abstract class Scanner {
     public abstract void scanToken();
 
     protected boolean testEnd() {
-        return current >= source.length();
+        return context.current >= context.source.length();
     }
 
     protected void string(TokenType type) {
         while (!isNextSpecialChar() && !testEnd()) {
             if (peek() == '\n') {
-                line++;
+                context.line++;
             }
             advance();
         }
@@ -126,20 +105,20 @@ public abstract class Scanner {
     }
 
     protected char advance() {
-        current++;
-        linePos++;
-        return source.charAt(current - 1);
+        context.current++;
+        context.linePos++;
+        return context.source.charAt(context.current - 1);
     }
 
     protected boolean match(char expected) {
         if (testEnd()) {
             return false;
         }
-        if (source.charAt(current) != expected) {
+        if (context.source.charAt(context.current) != expected) {
             return false;
         }
 
-        current++;
+        context.current++;
         return true;
     }
 
@@ -147,43 +126,43 @@ public abstract class Scanner {
         if (testEnd()) {
             return '\0';
         }
-        return source.charAt(current);
+        return context.source.charAt(context.current);
     }
 
     protected char peekNext() {
-        if (current + 1 >= source.length()) {
+        if (context.current + 1 >= context.source.length()) {
             return '\0';
         }
-        return source.charAt(current + 1);
+        return context.source.charAt(context.current + 1);
     }
 
     protected void newLine() {
         addToken(TokenType.NEWLINE);
-        line++;
-        linePos = 0;
+        context.line++;
+        context.linePos = 0;
     }
 
     protected void addToken(TokenType type) {
-        String text = source.substring(start, current);
-        tokens.add(new Token(type, text, line, linePos - text.length(), current - text.length()));
+        String text = context.source.substring(context.start, context.current);
+        context.tokens.add(new Token(type, text, context.line, context.linePos - text.length(), context.current - text.length()));
     }
 
     protected void addTo(TokenType type) {
-        String text = source.substring(start, current);
-        funStart = new Token(type, text, line, linePos - text.length(), current - text.length());
+        String text = context.source.substring(context.start, context.current);
+        context.funStart = new Token(type, text, context.line, context.linePos - text.length(), context.current - text.length());
 
-        tokens.add(funStart);
+        context.tokens.add(context.funStart);
     }
 
     protected void addEnd(TokenType type) {
-        String text = source.substring(funStart.getAbsolute(), current);
-        int absolutePos = current - source.substring(start, current).length();
+        String text = context.source.substring(context.funStart.getAbsolute(), context.current);
+        int absolutePos = context.current - context.source.substring(context.start, context.current).length();
 
-        funEnd = new Token(type, text, line, linePos - text.length(), absolutePos);
+        context.funEnd = new Token(type, text, context.line, context.linePos - text.length(), absolutePos);
 
-        tokens.add(funEnd);
+        context.tokens.add(context.funEnd);
 
-        funStart = null;
-        funEnd = null;
+        context.funStart = null;
+        context.funEnd = null;
     }
 }
