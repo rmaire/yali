@@ -172,13 +172,13 @@ public class Arithmetic implements ProcedureProvider {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("add", (interpreter, val) -> this.add(interpreter, val), (interpreter, val) -> false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("mul", (interpreter, val) -> this.mul(interpreter, val), (interpreter, val) -> false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("sub", (interpreter, val) -> this.sub(interpreter, val), (interpreter, val) -> false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("div", (interpreter, val) -> this.div(interpreter, val), (interpreter, val) -> false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("mod", (interpreter, val) -> this.mod(interpreter, val), (interpreter, val) -> false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("integer", (interpreter, val) -> this.integer(interpreter, val), (interpreter, val) -> false, "__val__"));
-        it.env().define(new Procedure("round", (interpreter, val) -> this.round(interpreter, val), (interpreter, val) -> false, "__val__"));
+        it.env().define(new Procedure("add", (interpreter, val) -> this.add(interpreter, val), () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("mul", (interpreter, val) -> this.mul(interpreter, val), () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("sub", (interpreter, val) -> this.sub(interpreter, val), () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("div", (interpreter, val) -> this.div(interpreter, val), () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("mod", (interpreter, val) -> this.mod(interpreter, val), () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("integer", (interpreter, val) -> this.integer(interpreter, val), () ->false, "__val__"));
+        it.env().define(new Procedure("round", (interpreter, val) -> this.round(interpreter, val), () ->false, "__val__"));
 
         return it;
     }

@@ -88,7 +88,7 @@ public class Template implements ProcedureProvider {
         return mapResult(interpreter);
     }
 
-    public Boolean mapFinished(Interpreter interpreter, Node result) {
+    public Boolean mapFinished() {
         if (!mapRunning) {
             mapResults.clear();
             mapTemplate = Node.none();
@@ -172,7 +172,7 @@ public class Template implements ProcedureProvider {
         return filterResult(interpreter);
     }
 
-    public Boolean filterFinished(Interpreter interpreter, Node result) {
+    public Boolean filterFinished() {
         if (!filterRunning) {
             filterResults.clear();
             filterTemplate = Node.none();
@@ -268,8 +268,8 @@ public class Template implements ProcedureProvider {
     @Override
     public Interpreter registerProcedures(Interpreter it) {
 
-        it.env().define(new Procedure("map", (interpreter, val) -> this.map(interpreter, val), (interpreter, val) -> this.mapFinished(interpreter, val), "__template__", "__values__").macro());
-        it.env().define(new Procedure("filter", (interpreter, val) -> this.filter(interpreter, val), (interpreter, val) -> this.filterFinished(interpreter, val), "__template__", "__values__").macro());
+        it.env().define(new Procedure("map", (interpreter, val) -> this.map(interpreter, val), this::mapFinished, "__template__", "__values__").macro());
+        it.env().define(new Procedure("filter", (interpreter, val) -> this.filter(interpreter, val), this::filterFinished, "__template__", "__values__").macro());
 //        it.env().define(new Procedure("find", (scope, val) -> this.find(scope, val), (scope, val) -> Node.none(), "__template__", "__values__"));
 
         return it;
