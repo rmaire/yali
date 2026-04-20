@@ -95,11 +95,11 @@ public class MockTurtleManager implements ProcedureProvider {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("fd", (interpreter, val) -> this.fd(interpreter, val), (interpreter, val) -> Node.none(), "__dist__"));
-        it.env().define(new Procedure("bk", (interpreter, val) -> this.bk(interpreter, val), (interpreter, val) -> Node.none(), "__dist__"));
-        it.env().define(new Procedure("lt", (interpreter, val) -> this.lt(interpreter, val), (interpreter, val) -> Node.none(), "__angle__"));
-        it.env().define(new Procedure("rt", (interpreter, val) -> this.rt(interpreter, val), (interpreter, val) -> Node.none(), "__angle__"));
-        it.env().define(new Procedure("turtlepos", (interpreter, val) -> this.turtlepos(interpreter, val), (interpreter, val) -> Node.none()));
+        it.env().define(new Procedure("fd", (interpreter, val) -> this.fd(interpreter, val), (interpreter, val) -> false, "__dist__"));
+        it.env().define(new Procedure("bk", (interpreter, val) -> this.bk(interpreter, val), (interpreter, val) -> false, "__dist__"));
+        it.env().define(new Procedure("lt", (interpreter, val) -> this.lt(interpreter, val), (interpreter, val) -> false, "__angle__"));
+        it.env().define(new Procedure("rt", (interpreter, val) -> this.rt(interpreter, val), (interpreter, val) -> false, "__angle__"));
+        it.env().define(new Procedure("turtlepos", (interpreter, val) -> this.turtlepos(interpreter, val), (interpreter, val) -> false));
 
         return it;
     }

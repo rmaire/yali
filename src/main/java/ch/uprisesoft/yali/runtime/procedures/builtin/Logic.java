@@ -145,12 +145,12 @@ public class Logic implements ProcedureProvider {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("equal?", (interpreter, val) -> this.equal(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("notequal?", (interpreter, val) -> this.inequal(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("less?", (interpreter, val) -> this.less(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("greater?", (interpreter, val) -> this.greater(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
-        it.env().define(new Procedure("greaterequal?", (interpreter, val) -> this.greaterorequal(interpreter, val), (interpreter, val) -> Node.none(), "__fst", "__snd__"));
-        it.env().define(new Procedure("lessequal?", (interpreter, val) -> this.lessorequal(interpreter, val), (interpreter, val) -> Node.none(), "__fst__", "__snd__"));
+        it.env().define(new Procedure("equal?", (interpreter, val) -> this.equal(interpreter, val), (interpreter, val) -> false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("notequal?", (interpreter, val) -> this.inequal(interpreter, val), (interpreter, val) -> false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("less?", (interpreter, val) -> this.less(interpreter, val), (interpreter, val) -> false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("greater?", (interpreter, val) -> this.greater(interpreter, val), (interpreter, val) -> false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("greaterequal?", (interpreter, val) -> this.greaterorequal(interpreter, val), (interpreter, val) -> false, "__fst", "__snd__"));
+        it.env().define(new Procedure("lessequal?", (interpreter, val) -> this.lessorequal(interpreter, val), (interpreter, val) -> false, "__fst__", "__snd__"));
 
         return it;
     }

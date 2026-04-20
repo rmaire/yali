@@ -88,14 +88,14 @@ public class Template implements ProcedureProvider {
         return mapResult(interpreter);
     }
 
-    public Node mapFinished(Interpreter interpreter, Node result) {
+    public Boolean mapFinished(Interpreter interpreter, Node result) {
         if (!mapRunning) {
             mapResults.clear();
             mapTemplate = Node.none();
             mapValues = new ArrayList<>();
-            return Node.bool(false);
+            return false;
         }
-        return Node.bool(true);
+        return true;
     }
 
     private Node mapResult(Interpreter it) {
@@ -172,14 +172,14 @@ public class Template implements ProcedureProvider {
         return filterResult(interpreter);
     }
 
-    public Node filterFinished(Interpreter interpreter, Node result) {
+    public Boolean filterFinished(Interpreter interpreter, Node result) {
         if (!filterRunning) {
             filterResults.clear();
             filterTemplate = Node.none();
             filterValues = new ArrayList<>();
-            return Node.bool(false);
+            return false;
         }
-        return Node.bool(true);
+        return true;
     }
 
     private Node filterResult(Interpreter it) {

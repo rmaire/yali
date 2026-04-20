@@ -159,12 +159,12 @@ public class Control implements ProcedureProvider {
         return result;
     }
 
-    private Node ifexprFinished(Interpreter interpreter, Node result) {
+    private Boolean ifexprFinished(Interpreter interpreter, Node result) {
         if (ifexprsToRun.isEmpty()) {
             ifexprsToRun = null;
-            return Node.bool(false);
+            return false;
         } else {
-            return Node.bool(true);
+            return true;
         }
     }
 
@@ -201,12 +201,12 @@ public class Control implements ProcedureProvider {
         return result;
     }
 
-    private Node ifelseexprFinished(Interpreter interpreter, Node result) {
+    private Boolean ifelseexprFinished(Interpreter interpreter, Node result) {
         if (ifelseexprsToRun.isEmpty()) {
             ifelseexprsToRun = null;
-            return Node.bool(false);
+            return false;
         } else {
-            return Node.bool(true);
+            return true;
         }
     }
 
@@ -250,12 +250,12 @@ public class Control implements ProcedureProvider {
         return result;
     }
     
-    private Node repeatexprFinished(Interpreter interpreter, Node result) {
+    private Boolean repeatexprFinished(Interpreter interpreter, Node result) {
         if (repeatexprToRun.isEmpty()) {
             repeatexprToRun = null;
-            return Node.bool(false);
+            return false;
         } else {
-            return Node.bool(true);
+            return true;
         }
     }
 
@@ -277,12 +277,12 @@ public class Control implements ProcedureProvider {
         return result;
     }
 
-    private Node runFinished(Interpreter interpreter, Node result) {
+    private Boolean runFinished(Interpreter interpreter, Node result) {
         if (proceduresToRun.isEmpty()) {
             proceduresToRun = null;
-            return Node.bool(false);
+            return false;
         } else {
-            return Node.bool(true);
+            return true;
         }
     }
 
@@ -301,18 +301,18 @@ public class Control implements ProcedureProvider {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("alias", (interpreter, val) -> this.alias(interpreter, val), (interpreter, val) -> Node.none(), "__original__", "__alias__"));
-        it.env().define(new Procedure("thing", (interpreter, val) -> this.thing(interpreter, val), (interpreter, val) -> Node.none(), "__name__").macro());
-        it.env().define(new Procedure("make", (interpreter, val) -> this.make(interpreter, val), (interpreter, val) -> Node.none(), "__name__", "__value__").macro());
-        it.env().define(new Procedure("local", (interpreter, val) -> this.local(interpreter, val), (interpreter, val) -> Node.none(), "__name__").macro());
-        it.env().define(new Procedure("localmake", (interpreter, val) -> this.localmake(interpreter, val), (interpreter, val) -> Node.none(), "__name__", "__value__").macro());
+        it.env().define(new Procedure("alias", (interpreter, val) -> this.alias(interpreter, val), (interpreter, val) -> false, "__original__", "__alias__"));
+        it.env().define(new Procedure("thing", (interpreter, val) -> this.thing(interpreter, val), (interpreter, val) ->false, "__name__").macro());
+        it.env().define(new Procedure("make", (interpreter, val) -> this.make(interpreter, val), (interpreter, val) -> false, "__name__", "__value__").macro());
+        it.env().define(new Procedure("local", (interpreter, val) -> this.local(interpreter, val), (interpreter, val) ->false, "__name__").macro());
+        it.env().define(new Procedure("localmake", (interpreter, val) -> this.localmake(interpreter, val), (interpreter, val) -> false, "__name__", "__value__").macro());
         it.env().define(new Procedure("repeat", (interpreter, val) -> this.repeat(interpreter, val), (interpreter, val) -> this.repeatexprFinished(interpreter, val), "__control__", "__block__").macro());
         it.env().define(new Procedure("run", (interpreter, val) -> this.run(interpreter, val), (interpreter, val) -> this.runFinished(interpreter, val), "__block__").macro());
-        it.env().define(new Procedure("output", (interpreter, val) -> this.output(interpreter, val), (interpreter, val) -> Node.none(), "__block__"));
-        it.env().define(new Procedure("stop", (interpreter, val) -> this.output(interpreter, val), (interpreter, val) -> Node.none()));
+        it.env().define(new Procedure("output", (interpreter, val) -> this.output(interpreter, val), (interpreter, val) -> false, "__block__"));
+        it.env().define(new Procedure("stop", (interpreter, val) -> this.output(interpreter, val), (interpreter, val) ->false));
         it.env().define(new Procedure("ifelse", (interpreter, val) -> this.ifelseexpr(interpreter, val), (interpreter, val) -> this.ifelseexprFinished(interpreter, val), "__condition__", "__iftrue__", "__iffalse__").macro());
         it.env().define(new Procedure("if", (interpreter, val) -> this.ifexpr(interpreter, val), (interpreter, val) -> this.ifexprFinished(interpreter, val), "__condition__", "__iftrue__").macro());
-        it.env().define(new Procedure("pause", (interpreter, val) -> this.pause(interpreter, val), (interpreter, val) -> Node.none()).macro());
+        it.env().define(new Procedure("pause", (interpreter, val) -> this.pause(interpreter, val), (interpreter, val) -> false).macro());
 
         return it;
     }

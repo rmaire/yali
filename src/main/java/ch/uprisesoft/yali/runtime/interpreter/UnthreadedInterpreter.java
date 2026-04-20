@@ -353,7 +353,7 @@ public class UnthreadedInterpreter implements Interpreter {
             // If the BiFunction callback for checking for more work returns true,
             // the procedure will stay scheduled. As soon as it returns false, the
             // call is marked as finished and descheduled in the next tick()
-            if (!nodeIsTrue(call.definition().getHasMoreCallback().apply(this, result))) {
+            if (!call.definition().getHasMoreCallback().apply(this, result)) {
                 call.result(result, env.peek());
                 call.evaluated(true);
             }

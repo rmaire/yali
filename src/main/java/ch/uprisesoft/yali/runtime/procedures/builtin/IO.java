@@ -101,11 +101,11 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("readword", (interpreter, val) -> this.readword(interpreter, val), (interpreter, val) -> Node.none()));
-        it.env().define(new Procedure("readlist", (interpreter, val) -> this.readlist(interpreter, val), (interpreter, val) -> Node.none()));
-        it.env().define(new Procedure("show", (interpreter, val) -> this.show(interpreter, val), (interpreter, val) -> Node.none(), "__output__"));
-        it.env().define(new Procedure("type", (interpreter, val) -> this.type(interpreter, val), (interpreter, val) -> Node.none(), "__output__"));
-        it.env().define(new Procedure("print", (interpreter, val) -> this.print(interpreter, val), (interpreter, val) -> Node.none(), "__output__"));
+        it.env().define(new Procedure("readword", (interpreter, val) -> this.readword(interpreter, val), (interpreter, val) -> false));
+        it.env().define(new Procedure("readlist", (interpreter, val) -> this.readlist(interpreter, val), (interpreter, val) -> false));
+        it.env().define(new Procedure("show", (interpreter, val) -> this.show(interpreter, val), (interpreter, val) -> false, "__output__"));
+        it.env().define(new Procedure("type", (interpreter, val) -> this.type(interpreter, val), (interpreter, val) -> false, "__output__"));
+        it.env().define(new Procedure("print", (interpreter, val) -> this.print(interpreter, val), (interpreter, val) -> false, "__output__"));
 
         return it;
     }
