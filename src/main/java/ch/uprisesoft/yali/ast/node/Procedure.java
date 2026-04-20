@@ -17,7 +17,6 @@ package ch.uprisesoft.yali.ast.node;
 
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
 import ch.uprisesoft.yali.runtime.procedures.FunctionType;
-import ch.uprisesoft.yali.scope.Scope;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -141,7 +140,7 @@ public class Procedure extends Node {
         if (this == obj) {
             return true;
         }
-        if (obj == null || !(obj instanceof Procedure)) {
+        if (!(obj instanceof Procedure)) {
             return false;
         }
 
@@ -152,16 +151,5 @@ public class Procedure extends Node {
         }
 
         return true;
-    }
-    
-    public String header() {
-        StringBuilder header = new StringBuilder();
-        
-        header.append(this.name);
-        for(String arg: args) {
-            header.append(" :").append(arg);
-        }
-        
-        return header.toString();
     }
 }

@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  *
  * @author uprisesoft@gmail.com
  */
-public class Call extends Node implements Iterator {
+public class Call extends Node implements Iterator<Node> {
 
     private final String name;
     private final java.util.List<Node> args;
@@ -70,8 +70,7 @@ public class Call extends Node implements Iterator {
     }
 
     public Call nextCall() {
-        Call next = definition.getChildren().get(callPos++).toProcedureCall();
-        return next;
+        return definition.getChildren().get(callPos++).toProcedureCall();
     }
 
     public void reset() {
@@ -112,20 +111,16 @@ public class Call extends Node implements Iterator {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
 
-        sb.append("(").append(name).append(" ");
+		String sb = "(" + name + " " +
+				children
+						.stream()
+						.map(Node::toString)
+						.collect(Collectors.joining(" ")
+						) +
+				")";
 
-        sb.append(
-                children
-                        .stream()
-                        .map(e -> e.toString())
-                        .collect(Collectors.joining(" ")
-                        ));
-
-        sb.append(")");
-
-        return sb.toString();
+        return sb;
     }
 
     @Override
@@ -144,7 +139,7 @@ public class Call extends Node implements Iterator {
         if (this == obj) {
             return true;
         }
-        if (obj == null || !(obj instanceof Call)) {
+        if (!(obj instanceof Call)) {
             return false;
         }
 
@@ -163,7 +158,7 @@ public class Call extends Node implements Iterator {
     }
 
     @Override
-    public Object next() {
+    public Node next() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

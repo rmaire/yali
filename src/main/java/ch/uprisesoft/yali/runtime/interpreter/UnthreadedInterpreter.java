@@ -40,13 +40,13 @@ import java.util.List;
  */
 public class UnthreadedInterpreter implements Interpreter {
 
-    private List<Tracer> tracers = new ArrayList<>();
+    private final List<Tracer> tracers = new ArrayList<>();
 
-    private Environment env = new Environment();
+    private final Environment env = new Environment();
     private boolean paused = false;
 
-    private java.util.Stack<Call> stack = new java.util.Stack<>();
-    private java.util.List<Call> program = new ArrayList<>();
+    private final java.util.Stack<Call> stack = new java.util.Stack<>();
+    private final java.util.List<Call> program = new ArrayList<>();
 
     private Node lastResult;
 
@@ -78,7 +78,7 @@ public class UnthreadedInterpreter implements Interpreter {
     /**
      * Runs a list of procedure calls
      *
-     * @param A node which is expected to be of list type. All children will be
+     * @param: A node which is expected to be of list type. All children will be
      * run first-to-last
      * @return Returns the last evaluated result
      */
@@ -101,7 +101,7 @@ public class UnthreadedInterpreter implements Interpreter {
     /**
      * Runs a single procedure call
      *
-     * @param A valid call object
+     * @param: A valid call object
      * @return Returns the last evaluated result
      */
     @Override
@@ -199,7 +199,7 @@ public class UnthreadedInterpreter implements Interpreter {
     /**
      * Parses an input string to a executable syntax tree
      *
-     * @param Yali source code
+     * @param: Yali source code
      * @return the parsed syntax tree, top element is always a list of procedure
      * calls
      */
@@ -213,7 +213,7 @@ public class UnthreadedInterpreter implements Interpreter {
      * control structures or other constructs which run a list as procedure
      * calls
      *
-     * @param Yali source code
+     * @param: Yali source code
      * @return the parsed syntax tree, top element is always a list of procedure
      * calls
      */
@@ -374,11 +374,7 @@ public class UnthreadedInterpreter implements Interpreter {
         }
     }
 
-    private boolean nodeIsTrue(Node node) {
-        return node.type().equals(NodeType.BOOLEAN) && node.toBooleanWord().getBoolean();
-    }
-
-    private Call unschedule() {
+    private void unschedule() {
         Call call = stack.pop();
 
         if (!call.definition().isMacro()) {
@@ -387,7 +383,6 @@ public class UnthreadedInterpreter implements Interpreter {
         }
         lastResult = call.result();
         tracers.forEach(t -> t.unschedule(call.getName(), call, env));
-        return call;
     }
 
     @Override

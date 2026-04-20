@@ -23,7 +23,6 @@ import ch.uprisesoft.yali.ast.node.word.FloatWord;
 import ch.uprisesoft.yali.ast.node.word.IntegerWord;
 import ch.uprisesoft.yali.ast.node.word.Word;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
-import ch.uprisesoft.yali.scope.Scope;
 import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
 
 /**
@@ -33,17 +32,17 @@ import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
 public class Arithmetic implements ProcedureProvider {
 
     private boolean checkArgs(Node node) {
-        return node.type().equals(NodeType.FLOAT) || node.type().equals(NodeType.INTEGER);
+        return !node.type().equals(NodeType.FLOAT) && !node.type().equals(NodeType.INTEGER);
     }
 
     public Node add(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
-        if (!checkArgs(left)) {
+        if (checkArgs(left)) {
             throw new NodeTypeException(Node.symbol("+"), left.type(), NodeType.NUMBER);
         }
-        if (!checkArgs(right)) {
+        if (checkArgs(right)) {
             throw new NodeTypeException(Node.symbol("+"), right.type(), NodeType.NUMBER);
         }
 
@@ -64,10 +63,10 @@ public class Arithmetic implements ProcedureProvider {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
-        if (!checkArgs(left)) {
+        if (checkArgs(left)) {
             throw new NodeTypeException(Node.symbol("-"), left.type(), NodeType.NUMBER);
         }
-        if (!checkArgs(right)) {
+        if (checkArgs(right)) {
             throw new NodeTypeException(Node.symbol("-"), right.type(), NodeType.NUMBER);
         }
 
@@ -87,10 +86,10 @@ public class Arithmetic implements ProcedureProvider {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
-        if (!checkArgs(left)) {
+        if (checkArgs(left)) {
             throw new NodeTypeException(Node.symbol("*"), left.type(), NodeType.NUMBER);
         }
-        if (!checkArgs(right)) {
+        if (checkArgs(right)) {
             throw new NodeTypeException(Node.symbol("*"), right.type(), NodeType.NUMBER);
         }
 
@@ -110,10 +109,10 @@ public class Arithmetic implements ProcedureProvider {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
-        if (!checkArgs(left)) {
+        if (checkArgs(left)) {
             throw new NodeTypeException(Node.symbol("/"), left.type(), NodeType.NUMBER);
         }
-        if (!checkArgs(right)) {
+        if (checkArgs(right)) {
             throw new NodeTypeException(Node.symbol("/"), right.type(), NodeType.NUMBER);
         }
 
@@ -172,13 +171,13 @@ public class Arithmetic implements ProcedureProvider {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("add", (interpreter, val) -> this.add(interpreter, val), () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("mul", (interpreter, val) -> this.mul(interpreter, val), () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("sub", (interpreter, val) -> this.sub(interpreter, val), () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("div", (interpreter, val) -> this.div(interpreter, val), () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("mod", (interpreter, val) -> this.mod(interpreter, val), () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("integer", (interpreter, val) -> this.integer(interpreter, val), () ->false, "__val__"));
-        it.env().define(new Procedure("round", (interpreter, val) -> this.round(interpreter, val), () ->false, "__val__"));
+        it.env().define(new Procedure("add", this::add, () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("mul", this::mul, () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("sub", this::sub, () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("div", this::div, () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("mod", this::mod, () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("integer", this::integer, () ->false, "__val__"));
+        it.env().define(new Procedure("round", this::round, () ->false, "__val__"));
 
         return it;
     }

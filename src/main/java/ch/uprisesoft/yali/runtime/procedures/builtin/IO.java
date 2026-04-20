@@ -26,7 +26,6 @@ import ch.uprisesoft.yali.runtime.io.InputGenerator;
 import ch.uprisesoft.yali.runtime.io.InputReceiver;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
 import ch.uprisesoft.yali.runtime.io.OutputSubject;
-import ch.uprisesoft.yali.scope.Scope;
 import java.util.ArrayList;
 import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
 
@@ -36,7 +35,7 @@ import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
  */
 public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
 
-    private java.util.List<OutputObserver> observers = new ArrayList<>();
+    private final java.util.List<OutputObserver> observers = new ArrayList<>();
     private InputGenerator generator;
 
     public Node print(Interpreter interpreter, java.util.List<Node> args) {
@@ -57,9 +56,8 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
             }
             returnValue.addChild(arg);
         }
-        
-        java.util.List<String> stringifiedArgs = new ArrayList<>();
-        stringifiedArgs.addAll(interpreter.stringify(concreteArgs));
+
+		java.util.List<String> stringifiedArgs = new ArrayList<>(interpreter.stringify(concreteArgs));
 
         inform(String.join(" ", stringifiedArgs) + "\n");
 
@@ -67,45 +65,39 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
     }
 
     public Node show(Interpreter interpreter, java.util.List<Node> args) {
-        java.util.List<String> stringifiedArgs = new ArrayList<>();
-        stringifiedArgs.addAll(interpreter.stringify(args));
+		java.util.List<String> stringifiedArgs = new ArrayList<>(interpreter.stringify(args));
 
         inform(String.join(" ", stringifiedArgs) + "\n");
         return Node.nil();
     }
 
     public Node type(Interpreter interpreter, java.util.List<Node> args) {
-        java.util.List<String> stringifiedArgs = new ArrayList<>();
-        stringifiedArgs.addAll(interpreter.stringify(args));
+		java.util.List<String> stringifiedArgs = new ArrayList<>(interpreter.stringify(args));
 
         inform(String.join(" ", stringifiedArgs));
         return Node.nil();
     }
 
     public Node readword(Interpreter interpreter, java.util.List<Node> args) {
-        QuotedWord result = new QuotedWord(requestLine());
-        return result;
+		return new QuotedWord(requestLine());
     }
 
     public Node readlist(Interpreter interpreter, java.util.List<Node> args) {
 
-        StringBuffer list = new StringBuffer();
-        list.append("[");
-        list.append(requestLine());
-        list.append("]");
+		String list = "[" +
+				requestLine() +
+				"]";
 
-        List result = (List) interpreter.read(list.toString());
-
-        return result;
+		return (List) interpreter.read(list);
     }
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("readword", (interpreter, val) -> this.readword(interpreter, val), () ->false));
-        it.env().define(new Procedure("readlist", (interpreter, val) -> this.readlist(interpreter, val), () ->false));
-        it.env().define(new Procedure("show", (interpreter, val) -> this.show(interpreter, val), () ->false, "__output__"));
-        it.env().define(new Procedure("type", (interpreter, val) -> this.type(interpreter, val), () ->false, "__output__"));
-        it.env().define(new Procedure("print", (interpreter, val) -> this.print(interpreter, val), () ->false, "__output__"));
+        it.env().define(new Procedure("readword", this::readword, () ->false));
+        it.env().define(new Procedure("readlist", this::readlist, () ->false));
+        it.env().define(new Procedure("show", this::show, () ->false, "__output__"));
+        it.env().define(new Procedure("type", this::type, () ->false, "__output__"));
+        it.env().define(new Procedure("print", this::print, () ->false, "__output__"));
 
         return it;
     }
@@ -124,10 +116,6 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
         for (OutputObserver oo : observers) {
             oo.inform(output);
         }
-    }
-
-    private String request() {
-        return generator.request();
     }
 
     private String requestLine() {

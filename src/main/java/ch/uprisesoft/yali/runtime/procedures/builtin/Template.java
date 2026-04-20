@@ -20,7 +20,6 @@ import ch.uprisesoft.yali.ast.node.Procedure;
 import ch.uprisesoft.yali.ast.node.Node;
 import ch.uprisesoft.yali.exception.NodeTypeException;
 import ch.uprisesoft.yali.ast.node.NodeType;
-import ch.uprisesoft.yali.scope.Scope;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
 import java.util.ArrayList;
 import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
@@ -32,7 +31,7 @@ import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
 public class Template implements ProcedureProvider {
 
     private Node mapTemplate = Node.none();
-    private java.util.List<Node> mapResults = new ArrayList<>();
+    private final java.util.List<Node> mapResults = new ArrayList<>();
     private java.util.List<Node> mapValues = new ArrayList<>();
     private boolean mapIsList = false;
     private boolean mapRunning = false;
@@ -113,7 +112,7 @@ public class Template implements ProcedureProvider {
     }
 
     private Node filterTemplate = Node.none();
-    private java.util.List<Node> filterResults = new ArrayList<>();
+    private final java.util.List<Node> filterResults = new ArrayList<>();
     private java.util.List<Node> filterValues = new ArrayList<>();
     private boolean filterIsList = false;
     private boolean filterRunning = false;
@@ -268,8 +267,8 @@ public class Template implements ProcedureProvider {
     @Override
     public Interpreter registerProcedures(Interpreter it) {
 
-        it.env().define(new Procedure("map", (interpreter, val) -> this.map(interpreter, val), this::mapFinished, "__template__", "__values__").macro());
-        it.env().define(new Procedure("filter", (interpreter, val) -> this.filter(interpreter, val), this::filterFinished, "__template__", "__values__").macro());
+        it.env().define(new Procedure("map", this::map, this::mapFinished, "__template__", "__values__").macro());
+        it.env().define(new Procedure("filter", this::filter, this::filterFinished, "__template__", "__values__").macro());
 //        it.env().define(new Procedure("find", (scope, val) -> this.find(scope, val), (scope, val) -> Node.none(), "__template__", "__values__"));
 
         return it;

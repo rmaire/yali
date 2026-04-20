@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2020 Uprise Software.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,10 +21,9 @@ import ch.uprisesoft.yali.ast.node.Node;
 import ch.uprisesoft.yali.exception.NodeTypeException;
 import ch.uprisesoft.yali.ast.node.NodeType;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
-import ch.uprisesoft.yali.scope.Scope;
-import ch.uprisesoft.yali.runtime.interpreter.UnthreadedInterpreter;
 import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
 import ch.uprisesoft.yali.scope.VariableNotFoundException;
+
 import java.util.ArrayList;
 
 /**
@@ -33,287 +32,279 @@ import java.util.ArrayList;
  */
 public class Control implements ProcedureProvider {
 
-    // Only here so we don't have to strip it out as edge cases in the Reader. Does nothing.
-    public Node alias(Interpreter interpreter, java.util.List<Node> args) {
-        return Node.nil();
-    }
+	// Only here so we don't have to strip it out as edge cases in the Reader. Does nothing.
+	public Node alias(Interpreter interpreter, java.util.List<Node> args) {
+		return Node.nil();
+	}
 
-    public Node thing(Interpreter interpreter, java.util.List<Node> args) {
+	public Node thing(Interpreter interpreter, java.util.List<Node> args) {
 
-        final String name;
-        switch (args.get(0).type()) {
-            case SYMBOL:
-                name = args.get(0).toSymbolWord().getSymbol();
-                break;
-            case QUOTE:
-                name = args.get(0).toQuotedWord().getQuote();
-                break;
-            default:
-                throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.SYMBOL, NodeType.QUOTE);
-        }
+		final String name;
+		switch (args.get(0).type()) {
+			case SYMBOL:
+				name = args.get(0).toSymbolWord().getSymbol();
+				break;
+			case QUOTE:
+				name = args.get(0).toQuotedWord().getQuote();
+				break;
+			default:
+				throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.SYMBOL, NodeType.QUOTE);
+		}
 
-        if (!interpreter.env().thingable(name)) {
-            throw new VariableNotFoundException(name);
-        }
+		if (!interpreter.env().thingable(name)) {
+			throw new VariableNotFoundException(name);
+		}
 
-        Node value = interpreter.env().thing(name);
+		return interpreter.env().thing(name);
+	}
 
-        return value;
-    }
+	public Node local(Interpreter interpreter, java.util.List<Node> args) {
+		final String name;
 
-    public Node local(Interpreter interpreter, java.util.List<Node> args) {
-        final String name;
+		switch (args.get(0).type()) {
+			case SYMBOL:
+				name = args.get(0).toSymbolWord().getSymbol();
+				break;
+			case QUOTE:
+				name = args.get(0).toQuotedWord().getQuote();
+				break;
+			default:
+				throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.SYMBOL, NodeType.QUOTE);
+		}
 
-        switch (args.get(0).type()) {
-            case SYMBOL:
-                name = args.get(0).toSymbolWord().getSymbol();
-                break;
-            case QUOTE:
-                name = args.get(0).toQuotedWord().getQuote();
-                break;
-            default:
-                throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.SYMBOL, NodeType.QUOTE);
-        }
+		interpreter.tracers().forEach(t -> t.local(name, interpreter.env()));
+		interpreter.env().local(name);
 
-        interpreter.tracers().forEach(t -> t.local(name, interpreter.env()));
-        interpreter.env().local(name);
+		return Node.nil();
+	}
 
-        return Node.nil();
-    }
+	public Node make(Interpreter interpreter, java.util.List<Node> args) {
+		final Node newVar;
+		final String name;
 
-    public Node make(Interpreter interpreter, java.util.List<Node> args) {
-        final Node newVar;
-        final String name;
+		switch (args.get(0).type()) {
+			case SYMBOL:
+				name = args.get(0).toSymbolWord().getSymbol();
+				break;
+			case QUOTE:
+				name = args.get(0).toQuotedWord().getQuote();
+				break;
+			default:
+				throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.SYMBOL, NodeType.QUOTE);
+		}
 
-        switch (args.get(0).type()) {
-            case SYMBOL:
-                name = args.get(0).toSymbolWord().getSymbol();
-                break;
-            case QUOTE:
-                name = args.get(0).toQuotedWord().getQuote();
-                break;
-            default:
-                throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.SYMBOL, NodeType.QUOTE);
-        }
+		newVar = args.get(1);
 
-        newVar = args.get(1);
+		interpreter.env().make(name, newVar);
 
-        interpreter.env().make(name, newVar);
+		return newVar;
+	}
 
-        return newVar;
-    }
+	public Node localmake(Interpreter interpreter, java.util.List<Node> args) {
+		Node newVar;
+		String name;
 
-    public Node localmake(Interpreter interpreter, java.util.List<Node> args) {
-        Node newVar = null;
-        String name = "";
+		switch (args.get(0).type()) {
+			case SYMBOL:
+				name = args.get(0).toSymbolWord().getSymbol();
+				break;
+			case QUOTE:
+				name = args.get(0).toQuotedWord().getQuote();
+				break;
+			default:
+				throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.SYMBOL, NodeType.QUOTE);
+		}
 
-        switch (args.get(0).type()) {
-            case SYMBOL:
-                name = args.get(0).toSymbolWord().getSymbol();
-                break;
-            case QUOTE:
-                name = args.get(0).toQuotedWord().getQuote();
-                break;
-            default:
-                throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.SYMBOL, NodeType.QUOTE);
-        }
+		newVar = args.get(1);
+		interpreter.env().local(name);
+		interpreter.env().make(name, newVar);
 
-        newVar = args.get(1);
-        interpreter.env().local(name);
-        interpreter.env().make(name, newVar);
+		return newVar;
+	}
 
-        return newVar;
-    }
+	private java.util.List<Node> ifexprsToRun;
 
-    private java.util.List<Node> ifexprsToRun;
+	public Node ifexpr(Interpreter interpreter, java.util.List<Node> args) {
+		Node result = Node.none();
 
-    public Node ifexpr(Interpreter interpreter, java.util.List<Node> args) {
-        Node result = Node.none();
+		if (ifexprsToRun == null) {
 
-        if (ifexprsToRun == null) {
+			ifexprsToRun = new ArrayList<>();
 
-            ifexprsToRun = new ArrayList<>();
+			Node condition = args.get(0);
+			Node iftrue = args.get(1);
 
-            Node condition = args.get(0);
-            Node iftrue = args.get(1);
+			if (!condition.type().equals(NodeType.BOOLEAN)) {
+				throw new NodeTypeException(condition, condition.type(), NodeType.BOOLEAN);
+			}
 
-            if (!condition.type().equals(NodeType.BOOLEAN)) {
-                throw new NodeTypeException(condition, condition.type(), NodeType.BOOLEAN);
-            }
-
-            if (condition.toBooleanWord().getBoolean()) {
-                Node ast = interpreter.read(iftrue.toList());
-                ifexprsToRun.addAll(ast.getChildren());
-            } else {
+			if (condition.toBooleanWord().getBoolean()) {
+				Node ast = interpreter.read(iftrue.toList());
+				ifexprsToRun.addAll(ast.getChildren());
+			} else {
 //                result = it.output(Node.nil());
-                return Node.nil();
-            }
+				return Node.nil();
+			}
 
-        }
+		}
 
-        if (!ifexprsToRun.isEmpty()) {
-            Call next = ifexprsToRun.remove(0).toProcedureCall();
-            interpreter.schedule(next);
-        }
+		if (!ifexprsToRun.isEmpty()) {
+			Call next = ifexprsToRun.remove(0).toProcedureCall();
+			interpreter.schedule(next);
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    private Boolean ifexprFinished() {
-        if (ifexprsToRun.isEmpty()) {
-            ifexprsToRun = null;
-            return false;
-        } else {
-            return true;
-        }
-    }
+	private Boolean ifexprFinished() {
+		if (ifexprsToRun.isEmpty()) {
+			ifexprsToRun = null;
+			return false;
+		} else {
+			return true;
+		}
+	}
 
-    private java.util.List<Node> ifelseexprsToRun;
+	private java.util.List<Node> ifelseexprsToRun;
 
-    public Node ifelseexpr(Interpreter interpreter, java.util.List<Node> args) {
-        Node result = Node.none();
+	public Node ifelseexpr(Interpreter interpreter, java.util.List<Node> args) {
+		Node result = Node.none();
 
-        if (ifelseexprsToRun == null) {
-            ifelseexprsToRun = new ArrayList<>();
+		if (ifelseexprsToRun == null) {
+			ifelseexprsToRun = new ArrayList<>();
 
-            Node condition = args.get(0);
-            Node iftrue = args.get(1);
-            Node iffalse = args.get(2);
+			Node condition = args.get(0);
+			Node iftrue = args.get(1);
+			Node iffalse = args.get(2);
 
-            if (!condition.type().equals(NodeType.BOOLEAN)) {
-                throw new NodeTypeException(condition, condition.type(), NodeType.BOOLEAN);
-            }
+			if (!condition.type().equals(NodeType.BOOLEAN)) {
+				throw new NodeTypeException(condition, condition.type(), NodeType.BOOLEAN);
+			}
 
-            if (condition.toBooleanWord().getBoolean()) {
-                Node ast = interpreter.read(iftrue.toList());
-                ifelseexprsToRun.addAll(ast.getChildren());
-            } else {
-                Node ast = interpreter.read(iffalse.toList());
-                ifelseexprsToRun.addAll(ast.getChildren());
-            }
-        }
+			if (condition.toBooleanWord().getBoolean()) {
+				Node ast = interpreter.read(iftrue.toList());
+				ifelseexprsToRun.addAll(ast.getChildren());
+			} else {
+				Node ast = interpreter.read(iffalse.toList());
+				ifelseexprsToRun.addAll(ast.getChildren());
+			}
+		}
 
-        if (!ifelseexprsToRun.isEmpty()) {
-            Call next = ifelseexprsToRun.remove(0).toProcedureCall();
-            interpreter.schedule(next);
-        }
+		if (!ifelseexprsToRun.isEmpty()) {
+			Call next = ifelseexprsToRun.remove(0).toProcedureCall();
+			interpreter.schedule(next);
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    private Boolean ifelseexprFinished() {
-        if (ifelseexprsToRun.isEmpty()) {
-            ifelseexprsToRun = null;
-            return false;
-        } else {
-            return true;
-        }
-    }
+	private Boolean ifelseexprFinished() {
+		if (ifelseexprsToRun.isEmpty()) {
+			ifelseexprsToRun = null;
+			return false;
+		} else {
+			return true;
+		}
+	}
 
-    private java.util.List<Node> repeatexprToRun;
+	private java.util.List<Node> repeatexprToRun;
 
-    public Node repeat(Interpreter interpreter, java.util.List<Node> args) {
-        Node result = Node.none();
+	public Node repeat(Interpreter interpreter, java.util.List<Node> args) {
+		Node result = Node.none();
 
-        if (repeatexprToRun == null) {
-            repeatexprToRun = new ArrayList<>();
-            
-            Node control = args.get(0);
-            Node block = args.get(1);
+		if (repeatexprToRun == null) {
+			repeatexprToRun = new ArrayList<>();
 
-            if (!control.type().equals(NodeType.INTEGER)) {
-                if (!control.type().equals(NodeType.INTEGER)) {
-                    throw new NodeTypeException(control, control.type(), NodeType.INTEGER);
-                }
-            }
+			Node control = args.get(0);
+			Node block = args.get(1);
 
-            if (!block.type().equals(NodeType.LIST)) {
-                throw new NodeTypeException(block, block.type(), NodeType.LIST);
-            }
+			if (!control.type().equals(NodeType.INTEGER)) {
+				throw new NodeTypeException(control, control.type(), NodeType.INTEGER);
+			}
 
-            Integer idx = control.toIntegerWord().getInteger();
-            result = Node.nil();
-            
-            for (int i = 0; i < idx; i++) {
-                Node ast = interpreter.read(block.toList());
-                repeatexprToRun.addAll(ast.getChildren());
+			if (!block.type().equals(NodeType.LIST)) {
+				throw new NodeTypeException(block, block.type(), NodeType.LIST);
+			}
+
+			Integer idx = control.toIntegerWord().getInteger();
+			result = Node.nil();
+
+			for (int i = 0; i < idx; i++) {
+				Node ast = interpreter.read(block.toList());
+				repeatexprToRun.addAll(ast.getChildren());
 //                result = run(scope, block.toList());
-            }
-        }
-        
-        if (!repeatexprToRun.isEmpty()) {
-            Call next = repeatexprToRun.remove(0).toProcedureCall();
-            interpreter.schedule(next);
+			}
+		}
+
+		if (!repeatexprToRun.isEmpty()) {
+			Call next = repeatexprToRun.remove(0).toProcedureCall();
+			interpreter.schedule(next);
 //            it.schedule(it.read("print \"onemore").getChildren().get(0).toProcedureCall());
-        }
+		}
 
-        return result;
-    }
-    
-    private Boolean repeatexprFinished() {
-        if (repeatexprToRun.isEmpty()) {
-            repeatexprToRun = null;
-            return false;
-        } else {
-            return true;
-        }
-    }
+		return result;
+	}
 
-    private java.util.List<Node> proceduresToRun;
+	private Boolean repeatexprFinished() {
+		if (repeatexprToRun.isEmpty()) {
+			repeatexprToRun = null;
+			return false;
+		} else {
+			return true;
+		}
+	}
 
-    public Node run(Interpreter interpreter, java.util.List<Node> args) {
+	private java.util.List<Node> proceduresToRun;
 
-        Node result = Node.none();
+	public Node run(Interpreter interpreter, java.util.List<Node> args) {
 
-        if (proceduresToRun == null) {
-            proceduresToRun = new ArrayList<>();
-            Node ast = interpreter.read(args.get(0).toList());
-            proceduresToRun.addAll(ast.getChildren());
-        }
+		Node result = Node.none();
 
-        Call next = proceduresToRun.remove(0).toProcedureCall();
-        interpreter.schedule(next);
+		if (proceduresToRun == null) {
+			proceduresToRun = new ArrayList<>();
+			Node ast = interpreter.read(args.get(0).toList());
+			proceduresToRun.addAll(ast.getChildren());
+		}
 
-        return result;
-    }
+		Call next = proceduresToRun.remove(0).toProcedureCall();
+		interpreter.schedule(next);
 
-    private Boolean runFinished() {
-        if (proceduresToRun.isEmpty()) {
-            proceduresToRun = null;
-            return false;
-        } else {
-            return true;
-        }
-    }
+		return result;
+	}
 
-    public Node output(Interpreter interpreter, java.util.List<Node> args) {
-        return args.get(0);
-    }
+	private Boolean runFinished() {
+		if (proceduresToRun.isEmpty()) {
+			proceduresToRun = null;
+			return false;
+		} else {
+			return true;
+		}
+	}
 
-    public Node stop(Scope scope, java.util.List<Node> args) {
-        return Node.nil();
-    }
+	public Node output(Interpreter interpreter, java.util.List<Node> args) {
+		return args.get(0);
+	}
 
-    public Node pause(Interpreter interpreter, java.util.List<Node> arg) {
-        interpreter.pause();
-        return Node.nil();
-    }
+	public Node pause(Interpreter interpreter, java.util.List<Node> args) {
+		interpreter.pause();
+		return Node.nil();
+	}
 
-    @Override
-    public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("alias", (interpreter, val) -> this.alias(interpreter, val), () ->false, "__original__", "__alias__"));
-        it.env().define(new Procedure("thing", (interpreter, val) -> this.thing(interpreter, val), () ->false, "__name__").macro());
-        it.env().define(new Procedure("make", (interpreter, val) -> this.make(interpreter, val), () ->false, "__name__", "__value__").macro());
-        it.env().define(new Procedure("local", (interpreter, val) -> this.local(interpreter, val), () ->false, "__name__").macro());
-        it.env().define(new Procedure("localmake", (interpreter, val) -> this.localmake(interpreter, val), () ->false, "__name__", "__value__").macro());
-        it.env().define(new Procedure("repeat", (interpreter, val) -> this.repeat(interpreter, val), this::repeatexprFinished, "__control__", "__block__").macro());
-        it.env().define(new Procedure("run", (interpreter, val) -> this.run(interpreter, val), this::runFinished, "__block__").macro());
-        it.env().define(new Procedure("output", (interpreter, val) -> this.output(interpreter, val), () ->false, "__block__"));
-        it.env().define(new Procedure("stop", (interpreter, val) -> this.output(interpreter, val), () ->false));
-        it.env().define(new Procedure("ifelse", (interpreter, val) -> this.ifelseexpr(interpreter, val), this::ifelseexprFinished, "__condition__", "__iftrue__", "__iffalse__").macro());
-        it.env().define(new Procedure("if", (interpreter, val) -> this.ifexpr(interpreter, val), this::ifexprFinished, "__condition__", "__iftrue__").macro());
-        it.env().define(new Procedure("pause", (interpreter, val) -> this.pause(interpreter, val), () ->false).macro());
+	@Override
+	public Interpreter registerProcedures(Interpreter it) {
+		it.env().define(new Procedure("alias",  this::alias, () -> false, "__original__", "__alias__"));
+		it.env().define(new Procedure("thing", this::thing, () -> false, "__name__").macro());
+		it.env().define(new Procedure("make", this::make, () -> false, "__name__", "__value__").macro());
+		it.env().define(new Procedure("local", this::local, () -> false, "__name__").macro());
+		it.env().define(new Procedure("localmake", this::localmake, () -> false, "__name__", "__value__").macro());
+		it.env().define(new Procedure("repeat", this::repeat, this::repeatexprFinished, "__control__", "__block__").macro());
+		it.env().define(new Procedure("run", this::run, this::runFinished, "__block__").macro());
+		it.env().define(new Procedure("output", this::output, () -> false, "__block__"));
+		it.env().define(new Procedure("stop", this::output, () -> false));
+		it.env().define(new Procedure("ifelse", this::ifelseexpr, this::ifelseexprFinished, "__condition__", "__iftrue__", "__iffalse__").macro());
+		it.env().define(new Procedure("if", this::ifexpr, this::ifexprFinished, "__condition__", "__iftrue__").macro());
+		it.env().define(new Procedure("pause", this::pause, () -> false).macro());
 
-        return it;
-    }
+		return it;
+	}
 }

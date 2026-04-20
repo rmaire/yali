@@ -35,7 +35,7 @@ public class MockTurtleManager implements ProcedureProvider {
 
     public Node fd(Interpreter interpreter, java.util.List<Node> args) {
         Node arg = args.get(0);
-        IntegerWord resolvedArg = null;
+        IntegerWord resolvedArg;
         if (!arg.type().equals(NodeType.INTEGER)) {
             throw new NodeTypeException(arg, arg.type(), NodeType.INTEGER);
         }
@@ -47,7 +47,7 @@ public class MockTurtleManager implements ProcedureProvider {
 
     public Node bk(Interpreter interpreter, java.util.List<Node> args) {
         Node arg = args.get(0);
-        IntegerWord resolvedArg = null;
+        IntegerWord resolvedArg;
         if (!arg.type().equals(NodeType.INTEGER)) {
             throw new NodeTypeException(arg, arg.type(), NodeType.INTEGER);
         }
@@ -59,7 +59,7 @@ public class MockTurtleManager implements ProcedureProvider {
 
     public Node lt(Interpreter interpreter, java.util.List<Node> args) {
         Node arg = args.get(0);
-        IntegerWord resolvedArg = null;
+        IntegerWord resolvedArg;
         if (!arg.type().equals(NodeType.INTEGER)) {
             throw new NodeTypeException(arg, arg.type(), NodeType.INTEGER);
         }
@@ -71,7 +71,7 @@ public class MockTurtleManager implements ProcedureProvider {
 
     public Node rt(Interpreter interpreter, java.util.List<Node> args) {
         Node arg = args.get(0);
-        IntegerWord resolvedArg = null;
+        IntegerWord resolvedArg;
         if (!arg.type().equals(NodeType.INTEGER)) {
             throw new NodeTypeException(arg, arg.type(), NodeType.INTEGER);
         }
@@ -95,11 +95,11 @@ public class MockTurtleManager implements ProcedureProvider {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("fd", (interpreter, val) -> this.fd(interpreter, val), () ->false, "__dist__"));
-        it.env().define(new Procedure("bk", (interpreter, val) -> this.bk(interpreter, val), () ->false, "__dist__"));
-        it.env().define(new Procedure("lt", (interpreter, val) -> this.lt(interpreter, val), () ->false, "__angle__"));
-        it.env().define(new Procedure("rt", (interpreter, val) -> this.rt(interpreter, val), () ->false, "__angle__"));
-        it.env().define(new Procedure("turtlepos", (interpreter, val) -> this.turtlepos(interpreter, val), () ->false));
+        it.env().define(new Procedure("fd", this::fd, () ->false, "__dist__"));
+        it.env().define(new Procedure("bk", this::bk, () ->false, "__dist__"));
+        it.env().define(new Procedure("lt", this::lt, () ->false, "__angle__"));
+        it.env().define(new Procedure("rt", this::rt, () ->false, "__angle__"));
+        it.env().define(new Procedure("turtlepos", this::turtlepos, () ->false));
 
         return it;
     }

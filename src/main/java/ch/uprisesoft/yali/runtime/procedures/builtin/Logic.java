@@ -22,7 +22,6 @@ import ch.uprisesoft.yali.ast.node.word.BooleanWord;
 import ch.uprisesoft.yali.ast.node.word.Word;
 import ch.uprisesoft.yali.exception.NodeTypeException;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
-import ch.uprisesoft.yali.scope.Scope;
 import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
 
 /**
@@ -145,12 +144,12 @@ public class Logic implements ProcedureProvider {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("equal?", (interpreter, val) -> this.equal(interpreter, val), () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("notequal?", (interpreter, val) -> this.inequal(interpreter, val), () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("less?", (interpreter, val) -> this.less(interpreter, val), () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("greater?", (interpreter, val) -> this.greater(interpreter, val), () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("greaterequal?", (interpreter, val) -> this.greaterorequal(interpreter, val), () ->false, "__fst", "__snd__"));
-        it.env().define(new Procedure("lessequal?", (interpreter, val) -> this.lessorequal(interpreter, val), () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("equal?", this::equal, () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("notequal?", this::inequal, () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("less?", this::less, () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("greater?", this::greater, () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("greaterequal?", this::greaterorequal, () ->false, "__fst", "__snd__"));
+        it.env().define(new Procedure("lessequal?", this::lessorequal, () ->false, "__fst__", "__snd__"));
 
         return it;
     }
