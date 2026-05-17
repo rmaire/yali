@@ -13,7 +13,7 @@ mvn -Pgithub deploy
 Or install locally
 
 ```
-mvn install:install-file -Dfile=target/yali-0.0.8.jar -DgroupId=ch.uprisesoft -DartifactId=yali -Dversion=0.0.8 -Dpackaging=jar
+mvn install:install-file -Dfile=target/yali-0.0.9.jar -DgroupId=ch.uprisesoft -DartifactId=yali -Dversion=0.0.9 -Dpackaging=jar
 ```
 
 # Embedding
@@ -26,7 +26,7 @@ Add to pom.xml:
     <dependency>
         <groupId>ch.uprisesoft</groupId>
         <artifactId>yali</artifactId>
-        <version>0.0.6</version>
+        <version>0.0.9</version>
     </dependency> 
 </dependencies>
 ```
@@ -37,7 +37,7 @@ Add to build.gradle:
 
 ```
 dependencies {
-    compile "ch.uprisesoft:yali:0.0.6"
+    compile "ch.uprisesoft:yali:0.0.9"
 }
 
 repositories {
@@ -71,7 +71,7 @@ public class Main {
 }
 ```
 
-The interpreter always returns the last evaluated result. You can check it's type
+The interpreter always returns the last evaluated result. You can check its type
 and cast it to the appropriate class type:
 
 ```
@@ -132,5 +132,3 @@ result = it.run(it.read(input));
 
 This results in printing to the console. You can do whatever you want with the
 output that the OutputObserver provides.
-
-## 
