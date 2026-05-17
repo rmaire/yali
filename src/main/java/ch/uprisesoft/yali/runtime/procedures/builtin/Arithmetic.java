@@ -15,8 +15,8 @@
  */
 package ch.uprisesoft.yali.runtime.procedures.builtin;
 
-import ch.uprisesoft.yali.ast.node.Procedure;
 import ch.uprisesoft.yali.ast.node.Node;
+import ch.uprisesoft.yali.ast.node.Procedure;
 import ch.uprisesoft.yali.exception.NodeTypeException;
 import ch.uprisesoft.yali.ast.node.NodeType;
 import ch.uprisesoft.yali.ast.node.word.FloatWord;
@@ -24,6 +24,8 @@ import ch.uprisesoft.yali.ast.node.word.IntegerWord;
 import ch.uprisesoft.yali.ast.node.word.Word;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
 import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
+
+import java.util.Optional;
 
 /**
  *
@@ -35,7 +37,7 @@ public class Arithmetic implements ProcedureProvider {
         return !node.type().equals(NodeType.FLOAT) && !node.type().equals(NodeType.INTEGER);
     }
 
-    public Node add(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> add(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -47,19 +49,19 @@ public class Arithmetic implements ProcedureProvider {
         }
 
         if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.INTEGER)) {
-            return new IntegerWord(left.getInteger() + right.getInteger());
+            return Optional.of(new IntegerWord(left.getInteger() + right.getInteger()));
         } else if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.FLOAT)) {
-            return new FloatWord(left.getInteger() + right.getFloat());
+            return Optional.of(new FloatWord(left.getInteger() + right.getFloat()));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.INTEGER)) {
-            return new FloatWord(left.getFloat() + right.getInteger());
+            return Optional.of(new FloatWord(left.getFloat() + right.getInteger()));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.FLOAT)) {
-            return new FloatWord(left.getFloat() + right.getFloat());
+            return Optional.of(new FloatWord(left.getFloat() + right.getFloat()));
         }
 
-        return Node.none();
+        return Optional.of(Node.none());
     }
 
-    public Node sub(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> sub(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -71,18 +73,18 @@ public class Arithmetic implements ProcedureProvider {
         }
 
         if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.INTEGER)) {
-            return new IntegerWord(left.getInteger() - right.getInteger());
+            return Optional.of(new IntegerWord(left.getInteger() - right.getInteger()));
         } else if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.FLOAT)) {
-            return new FloatWord(left.getInteger() - right.getFloat());
+            return Optional.of(new FloatWord(left.getInteger() - right.getFloat()));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.INTEGER)) {
-            return new FloatWord(left.getFloat() - right.getInteger());
+            return Optional.of(new FloatWord(left.getFloat() - right.getInteger()));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.FLOAT)) {
-            return new FloatWord(left.getFloat() - right.getFloat());
+            return Optional.of(new FloatWord(left.getFloat() - right.getFloat()));
         }
-        return Node.none();
+        return Optional.of(Node.none());
     }
 
-    public Node mul(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> mul(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -94,18 +96,18 @@ public class Arithmetic implements ProcedureProvider {
         }
 
         if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.INTEGER)) {
-            return new IntegerWord(left.getInteger() * right.getInteger());
+            return Optional.of(new IntegerWord(left.getInteger() * right.getInteger()));
         } else if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.FLOAT)) {
-            return new FloatWord(left.getInteger() * right.getFloat());
+            return Optional.of(new FloatWord(left.getInteger() * right.getFloat()));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.INTEGER)) {
-            return new FloatWord(left.getFloat() * right.getInteger());
+            return Optional.of(new FloatWord(left.getFloat() * right.getInteger()));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.FLOAT)) {
-            return new FloatWord(left.getFloat() * right.getFloat());
+            return Optional.of(new FloatWord(left.getFloat() * right.getFloat()));
         }
-        return Node.none();
+        return Optional.of(Node.none());
     }
 
-    public Node div(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> div(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -117,18 +119,18 @@ public class Arithmetic implements ProcedureProvider {
         }
 
         if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.INTEGER)) {
-            return new IntegerWord(left.getInteger() / right.getInteger());
+            return Optional.of(new IntegerWord(left.getInteger() / right.getInteger()));
         } else if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.FLOAT)) {
-            return new FloatWord(left.getInteger() / right.getFloat());
+            return Optional.of(new FloatWord(left.getInteger() / right.getFloat()));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.INTEGER)) {
-            return new FloatWord(left.getFloat() / right.getInteger());
+            return Optional.of(new FloatWord(left.getFloat() / right.getInteger()));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.FLOAT)) {
-            return new FloatWord(left.getFloat() / right.getFloat());
+            return Optional.of(new FloatWord(left.getFloat() / right.getFloat()));
         }
-        return Node.none();
+        return Optional.of(Node.none());
     }
     
-    public Node mod(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> mod(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -139,31 +141,31 @@ public class Arithmetic implements ProcedureProvider {
             throw new NodeTypeException(right, right.type(), NodeType.NUMBER);
         }
 
-        return new IntegerWord(left.getInteger() % right.getInteger());
+        return Optional.of(new IntegerWord(left.getInteger() % right.getInteger()));
     }
     
-    public Node integer(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> integer(Interpreter interpreter, java.util.List<Node> args) {
         Word arg = (Word) args.get(0);
 
         switch (arg.type()) {
             case INTEGER:
-                return arg;
+                return Optional.of(arg);
             case FLOAT:
-                return Node.integer(arg.toFloatWord().getFloat().intValue());
+                return Optional.of(Node.integer(arg.toFloatWord().getFloat().intValue()));
             default:
                 throw new NodeTypeException(arg, arg.type(), NodeType.FLOAT, NodeType.INTEGER);
         }
     }
     
     
-    public Node round(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> round(Interpreter interpreter, java.util.List<Node> args) {
         Word arg = (Word) args.get(0);
 
         switch (arg.type()) {
             case INTEGER:
-                return arg;
+                return Optional.of(arg);
             case FLOAT:
-                return Node.integer((int)Math.round(arg.toFloatWord().getFloat()));
+                return Optional.of(Node.integer((int) Math.round(arg.toFloatWord().getFloat())));
             default:
                 throw new NodeTypeException(arg, arg.type(), NodeType.FLOAT, NodeType.INTEGER);
         }
@@ -171,13 +173,13 @@ public class Arithmetic implements ProcedureProvider {
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("add", this::add, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("mul", this::mul, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("sub", this::sub, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("div", this::div, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("mod", this::mod, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("integer", this::integer, () ->false, "__val__"));
-        it.env().define(new Procedure("round", this::round, () ->false, "__val__"));
+        it.env().define(new Procedure("add", this::add, "__fst__", "__snd__"));
+        it.env().define(new Procedure("mul", this::mul, "__fst__", "__snd__"));
+        it.env().define(new Procedure("sub", this::sub, "__fst__", "__snd__"));
+        it.env().define(new Procedure("div", this::div, "__fst__", "__snd__"));
+        it.env().define(new Procedure("mod", this::mod, "__fst__", "__snd__"));
+        it.env().define(new Procedure("integer", this::integer, "__val__"));
+        it.env().define(new Procedure("round", this::round, "__val__"));
 
         return it;
     }

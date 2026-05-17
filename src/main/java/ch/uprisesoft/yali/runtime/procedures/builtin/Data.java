@@ -15,11 +15,8 @@
  */
 package ch.uprisesoft.yali.runtime.procedures.builtin;
 
-import ch.uprisesoft.yali.ast.node.Procedure;
-import ch.uprisesoft.yali.ast.node.List;
-import ch.uprisesoft.yali.ast.node.Node;
+import ch.uprisesoft.yali.ast.node.*;
 import ch.uprisesoft.yali.exception.NodeTypeException;
-import ch.uprisesoft.yali.ast.node.NodeType;
 import ch.uprisesoft.yali.ast.node.word.BooleanWord;
 import ch.uprisesoft.yali.ast.node.word.QuotedWord;
 import ch.uprisesoft.yali.ast.node.word.SymbolWord;
@@ -27,6 +24,7 @@ import ch.uprisesoft.yali.ast.node.word.Word;
 import java.util.ArrayList;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
 
@@ -37,66 +35,66 @@ import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
 public class Data implements ProcedureProvider {
 
     // Constructors
-    public Node reverse(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> reverse(Interpreter interpreter, java.util.List<Node> args) {
         if (args.get(0).type().equals(NodeType.LIST)) {
             List resultList = new List();
             java.util.List<Node> forwardList = args.get(0).getChildren();
             Collections.reverse(forwardList);
             resultList.addChildren(forwardList);
-            return resultList;
+            return Optional.of(resultList);
         } else if (args.get(0).type().equals(NodeType.QUOTE)) {
             StringBuilder resultString = new StringBuilder(args.get(0).toQuotedWord().getQuote());
-            return new QuotedWord(resultString.reverse().toString());
+            return Optional.of(new QuotedWord(resultString.reverse().toString()));
         } else if (args.get(0).type().equals(NodeType.SYMBOL)) {
             StringBuilder resultString = new StringBuilder(args.get(0).toSymbolWord().getSymbol());
-            return new SymbolWord(resultString.reverse().toString());
+            return Optional.of(new SymbolWord(resultString.reverse().toString()));
         } else {
             throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.LIST, NodeType.QUOTE, NodeType.SYMBOL);
         }
     }
 
-    public Node fput(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> fput(Interpreter interpreter, java.util.List<Node> args) {
         if (args.get(1).type().equals(NodeType.LIST)) {
             List resultList = new List();
             resultList.addChild(args.get(0));
             resultList.addChildren(args.get(1).getChildren());
-            return resultList;
+            return Optional.of(resultList);
         } else if (args.get(1).type().equals(NodeType.QUOTE)) {
 			String resultString = args.get(0).toQuotedWord().getQuote() + args.get(1).toQuotedWord().getQuote();
-            return new QuotedWord(resultString);
+            return Optional.of(new QuotedWord(resultString));
         } else if (args.get(1).type().equals(NodeType.SYMBOL)) {
 			String resultString = args.get(0).toSymbolWord().getSymbol() + args.get(1).toSymbolWord().getSymbol();
-            return new SymbolWord(resultString);
+            return Optional.of(new SymbolWord(resultString));
         } else {
             throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.LIST, NodeType.QUOTE, NodeType.SYMBOL);
         }
     }
 
-    public Node lput(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> lput(Interpreter interpreter, java.util.List<Node> args) {
         if (args.get(1).type().equals(NodeType.LIST)) {
             List resultList = new List();
             resultList.addChildren(args.get(1).getChildren());
             resultList.addChild(args.get(0));
-            return resultList;
+            return Optional.of(resultList);
         } else if (args.get(1).type().equals(NodeType.QUOTE)) {
 			String resultString = args.get(1).toQuotedWord().getQuote() + args.get(0).toQuotedWord().getQuote();
-            return new QuotedWord(resultString);
+            return Optional.of(new QuotedWord(resultString));
         } else if (args.get(1).type().equals(NodeType.SYMBOL)) {
 			String resultString = args.get(1).toSymbolWord().getSymbol() + args.get(0).toSymbolWord().getSymbol();
-            return new SymbolWord(resultString);
+            return Optional.of(new SymbolWord(resultString));
         } else {
             throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.LIST, NodeType.QUOTE, NodeType.SYMBOL);
         }
     }
 
-    public Node word(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> word(Interpreter interpreter, java.util.List<Node> args) {
         StringBuilder concatenated = new StringBuilder();
 
         for (Node arg : args) {
             concatenated.append(stringifyNode(arg));
         }
 
-        return new SymbolWord(concatenated.toString());
+        return Optional.of(new SymbolWord(concatenated.toString()));
     }
 
     public String stringifyNode(Node node) {
@@ -124,27 +122,27 @@ public class Data implements ProcedureProvider {
         return concatenated;
     }
 
-    public Node sentence(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> sentence(Interpreter interpreter, java.util.List<Node> args) {
         List list = new List();
-        list.addChildren(flatten(args));
-        return list;
+        list.addChildren(flatten(args).get());
+        return Optional.of(list);
     }
 
-    private java.util.List<Node> flatten(java.util.List<Node> list) {
+    private Optional<java.util.List<Node>> flatten(java.util.List<Node> list) {
         java.util.List<Node> flattened = new ArrayList<>();
 
         for (Node n : list) {
             if (n.type().equals(NodeType.LIST)) {
-                flattened.addAll(flatten(n.getChildren()));
+                flattened.addAll(flatten(n.getChildren()).get());
             } else {
                 flattened.add(n);
             }
         }
 
-        return flattened;
+        return Optional.of(flattened);
     }
 
-    public Node list(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> list(Interpreter interpreter, java.util.List<Node> args) {
         List list = new List();
 
         for (Node n : args) {
@@ -155,15 +153,15 @@ public class Data implements ProcedureProvider {
             }
         }
 
-        return list;
+        return Optional.of(list);
     }
 
-    public Node gensym(Interpreter interpreter, java.util.List<Node> args) {
-        return new SymbolWord(UUID.randomUUID().toString().replace("-", ""));
+    public Optional<Node> gensym(Interpreter interpreter, java.util.List<Node> args) {
+        return Optional.of(new SymbolWord(UUID.randomUUID().toString().replace("-", "")));
     }
 
     // Selectors
-    public Node first(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> first(Interpreter interpreter, java.util.List<Node> args) {
         Node first = args.get(0);
 
         switch (args.get(0).type()) {
@@ -180,10 +178,10 @@ public class Data implements ProcedureProvider {
                 throw new NodeTypeException(first, args.get(0).type(), NodeType.LIST);
         }
 
-        return first;
+        return Optional.ofNullable(first);
     }
 
-    public Node last(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> last(Interpreter interpreter, java.util.List<Node> args) {
 
         Node last = args.get(0);
 
@@ -205,10 +203,10 @@ public class Data implements ProcedureProvider {
                 throw new NodeTypeException(last, args.get(0).type(), NodeType.LIST);
         }
 
-        return last;
+        return Optional.ofNullable(last);
     }
 
-    public Node butfirst(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> butfirst(Interpreter interpreter, java.util.List<Node> args) {
 
 	    Node butfirst;
 
@@ -227,10 +225,10 @@ public class Data implements ProcedureProvider {
                 throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.LIST);
         }
 
-        return butfirst;
+        return Optional.of(butfirst);
     }
 
-    public Node butlast(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> butlast(Interpreter interpreter, java.util.List<Node> args) {
 
         Node butlast;
 
@@ -253,10 +251,10 @@ public class Data implements ProcedureProvider {
                 throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.LIST);
         }
 
-        return butlast;
+        return Optional.of(butlast);
     }
 
-    public Node item(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> item(Interpreter interpreter, java.util.List<Node> args) {
 
         Node item;
         Node index = args.get(0);
@@ -283,11 +281,11 @@ public class Data implements ProcedureProvider {
                 throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.LIST);
         }
 
-        return item;
+        return Optional.ofNullable(item);
     }
 
     // Mutators
-    public Node setitem(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> setitem(Interpreter interpreter, java.util.List<Node> args) {
 
 //        it.apply(args.get(0));
         Node index = args.get(0);
@@ -304,11 +302,11 @@ public class Data implements ProcedureProvider {
 
         list.getChildren().set(index.toIntegerWord().getInteger() - 1, newVal);
 
-        return list;
+        return Optional.of(list);
     }
 
     // Predicates
-    public Node emptyp(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> emptyp(Interpreter interpreter, java.util.List<Node> args) {
 
         Node list = args.get(0);
         Node empty = new BooleanWord(Boolean.FALSE);
@@ -317,10 +315,10 @@ public class Data implements ProcedureProvider {
             empty = new BooleanWord(Boolean.TRUE);
         }
 
-        return empty;
+        return Optional.of(empty);
     }
 
-    public Node wordp(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> wordp(Interpreter interpreter, java.util.List<Node> args) {
 
         Node word = args.get(0);
         Node wordp = new BooleanWord(Boolean.FALSE);
@@ -329,10 +327,10 @@ public class Data implements ProcedureProvider {
             wordp = new BooleanWord(Boolean.TRUE);
         }
 
-        return wordp;
+        return Optional.of(wordp);
     }
 
-    public Node numberp(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> numberp(Interpreter interpreter, java.util.List<Node> args) {
 
         Node word = args.get(0);
         Node wordp = new BooleanWord(Boolean.FALSE);
@@ -341,10 +339,10 @@ public class Data implements ProcedureProvider {
             wordp = new BooleanWord(Boolean.TRUE);
         }
 
-        return wordp;
+        return Optional.of(wordp);
     }
 
-    public Node listp(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> listp(Interpreter interpreter, java.util.List<Node> args) {
 
         Node list = args.get(0);
         Node listp = new BooleanWord(Boolean.FALSE);
@@ -353,18 +351,18 @@ public class Data implements ProcedureProvider {
             listp = new BooleanWord(Boolean.TRUE);
         }
 
-        return listp;
+        return Optional.of(listp);
     }
 
-    public Node equalp(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> equalp(Interpreter interpreter, java.util.List<Node> args) {
 
         Node fst = args.get(0);
         Node snd = args.get(1);
 
-		return new BooleanWord(fst.equals(snd));
+		return Optional.of(new BooleanWord(fst.equals(snd)));
     }
 
-    public Node memberp(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> memberp(Interpreter interpreter, java.util.List<Node> args) {
 
         Node member = args.get(0);
         Node list = args.get(1);
@@ -380,34 +378,34 @@ public class Data implements ProcedureProvider {
                 java.util.List<Node> subArgs = new ArrayList<>();
                 subArgs.add(member);
                 subArgs.add(lm);
-                result = equalp(interpreter, subArgs);
+                result = equalp(interpreter, subArgs).get();
             }
         }
 
-        return result.toBooleanWord();
+        return Optional.ofNullable(result.toBooleanWord());
     }
 
     // Queries
-    public Node count(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> count(Interpreter interpreter, java.util.List<Node> args) {
 
         Node element = args.get(0);
 
         if (element.type().equals(NodeType.LIST)) {
-            return Node.integer(element.getChildren().size());
+            return Optional.of(Node.integer(element.getChildren().size()));
         }
 
         if (element.type().equals(NodeType.QUOTE)) {
-            return Node.integer(element.toQuotedWord().getQuote().length());
+            return Optional.of(Node.integer(element.toQuotedWord().getQuote().length()));
         }
 
         if (element.type().equals(NodeType.SYMBOL)) {
-            return Node.integer(element.toSymbolWord().getSymbol().length());
+            return Optional.of(Node.integer(element.toSymbolWord().getSymbol().length()));
         }
 
-        return Node.integer(0);
+        return Optional.of(Node.integer(0));
     }
 
-    public Node lowercase(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> lowercase(Interpreter interpreter, java.util.List<Node> args) {
 
         Node element = args.get(0);
 
@@ -416,23 +414,23 @@ public class Data implements ProcedureProvider {
             for (Node lm : element.getChildren()) {
                 java.util.List<Node> subArgs = new ArrayList<>();
                 subArgs.add(lm);
-                result.addChild(lowercase(interpreter, subArgs));
+                result.addChild(lowercase(interpreter, subArgs).get());
             }
-            return result;
+            return Optional.of(result);
         }
 
         if (element.type().equals(NodeType.QUOTE)) {
-            return Node.quote(element.toQuotedWord().getQuote().toLowerCase());
+            return Optional.of(Node.quote(element.toQuotedWord().getQuote().toLowerCase()));
         }
 
         if (element.type().equals(NodeType.SYMBOL)) {
-            return Node.quote(element.toSymbolWord().getSymbol().toLowerCase());
+            return Optional.of(Node.quote(element.toSymbolWord().getSymbol().toLowerCase()));
         }
 
-        return element;
+        return Optional.of(element);
     }
 
-    public Node uppercase(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> uppercase(Interpreter interpreter, java.util.List<Node> args) {
 
         Node element = args.get(0);
 
@@ -441,46 +439,46 @@ public class Data implements ProcedureProvider {
             for (Node lm : element.getChildren()) {
                 java.util.List<Node> subArgs = new ArrayList<>();
                 subArgs.add(lm);
-                result.addChild(uppercase(interpreter, subArgs));
+                result.addChild(uppercase(interpreter, subArgs).get());
             }
-            return result;
+            return Optional.of(result);
         }
 
         if (element.type().equals(NodeType.QUOTE)) {
-            return Node.quote(element.toQuotedWord().getQuote().toUpperCase());
+            return Optional.of(Node.quote(element.toQuotedWord().getQuote().toUpperCase()));
         }
 
         if (element.type().equals(NodeType.SYMBOL)) {
-            return Node.quote(element.toSymbolWord().getSymbol().toUpperCase());
+            return Optional.of(Node.quote(element.toSymbolWord().getSymbol().toUpperCase()));
         }
 
-        return element;
+        return Optional.of(element);
     }
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("uppercase", this::uppercase, () ->false, "__element__"));
-        it.env().define(new Procedure("lowercase", this::lowercase, () ->false, "__element__"));
-        it.env().define(new Procedure("count", this::count, () ->false, "__element__"));
-        it.env().define(new Procedure("equal?", this::equalp, () ->false, "__fst", "__snd__"));
-        it.env().define(new Procedure("member?", this::memberp, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("list?", this::listp, () ->false, "__list__"));
-        it.env().define(new Procedure("number?", this::numberp, () ->false, "__number__"));
-        it.env().define(new Procedure("word?", this::wordp, () ->false, "__word__"));
-        it.env().define(new Procedure("empty?", this::emptyp, () ->false, "__list__"));
-        it.env().define(new Procedure("setitem", this::setitem, () ->false, "__index__", "__list__", "__newval__"));
-        it.env().define(new Procedure("item", this::item, () ->false, "__index__", "__listorword__"));
-        it.env().define(new Procedure("butlast", this::butlast, () ->false, "__listorword__"));
-        it.env().define(new Procedure("butfirst", this::butfirst, () ->false, "__listorword__"));
-        it.env().define(new Procedure("last", this::last, () ->false, "__listorword__"));
-        it.env().define(new Procedure("first", this::first, () ->false, "__listorword__"));
-        it.env().define(new Procedure("reverse", this::reverse, () ->false, "__list__"));
-        it.env().define(new Procedure("fput", this::fput, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("lput", this::lput, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("word", this::word, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("list", this::list, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("sentence", this::sentence, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("gensym", this::gensym, () ->false));
+        it.env().define(new Procedure("uppercase", this::uppercase, "__element__"));
+        it.env().define(new Procedure("lowercase", this::lowercase, "__element__"));
+        it.env().define(new Procedure("count", this::count, "__element__"));
+        it.env().define(new Procedure("equal?", this::equalp, "__fst", "__snd__"));
+        it.env().define(new Procedure("member?", this::memberp, "__fst__", "__snd__"));
+        it.env().define(new Procedure("list?", this::listp, "__list__"));
+        it.env().define(new Procedure("number?", this::numberp, "__number__"));
+        it.env().define(new Procedure("word?", this::wordp, "__word__"));
+        it.env().define(new Procedure("empty?", this::emptyp, "__list__"));
+        it.env().define(new Procedure("setitem", this::setitem, "__index__", "__list__", "__newval__"));
+        it.env().define(new Procedure("item", this::item, "__index__", "__listorword__"));
+        it.env().define(new Procedure("butlast", this::butlast, "__listorword__"));
+        it.env().define(new Procedure("butfirst", this::butfirst, "__listorword__"));
+        it.env().define(new Procedure("last", this::last, "__listorword__"));
+        it.env().define(new Procedure("first", this::first, "__listorword__"));
+        it.env().define(new Procedure("reverse", this::reverse, "__list__"));
+        it.env().define(new Procedure("fput", this::fput, "__fst__", "__snd__"));
+        it.env().define(new Procedure("lput", this::lput, "__fst__", "__snd__"));
+        it.env().define(new Procedure("word", this::word, "__fst__", "__snd__"));
+        it.env().define(new Procedure("list", this::list, "__fst__", "__snd__"));
+        it.env().define(new Procedure("sentence", this::sentence, "__fst__", "__snd__"));
+        it.env().define(new Procedure("gensym", this::gensym));
 
         return it;
     }

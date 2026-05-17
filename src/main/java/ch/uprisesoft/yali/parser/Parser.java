@@ -15,10 +15,7 @@
  */
 package ch.uprisesoft.yali.parser;
 
-import ch.uprisesoft.yali.ast.node.Call;
-import ch.uprisesoft.yali.ast.node.Procedure;
-import ch.uprisesoft.yali.ast.node.List;
-import ch.uprisesoft.yali.ast.node.Node;
+import ch.uprisesoft.yali.ast.node.*;
 import ch.uprisesoft.yali.ast.node.word.BooleanWord;
 import ch.uprisesoft.yali.ast.node.word.FloatWord;
 import ch.uprisesoft.yali.ast.node.word.NilWord;
@@ -26,7 +23,6 @@ import ch.uprisesoft.yali.ast.node.word.QuotedWord;
 import ch.uprisesoft.yali.ast.node.word.SymbolWord;
 import ch.uprisesoft.yali.lexer.Token;
 import ch.uprisesoft.yali.lexer.TokenType;
-import ch.uprisesoft.yali.ast.node.NodeType;
 import ch.uprisesoft.yali.ast.node.word.IntegerWord;
 import ch.uprisesoft.yali.exception.TokenTypeException;
 import ch.uprisesoft.yali.lexer.Lexer;
@@ -132,7 +128,7 @@ public class Parser {
 
         if (match(TokenType.TO)) {
 
-            Procedure fun = it.env().procedure(consume(TokenType.SYMBOL).getLexeme());
+            Procedure fun = (Procedure) it.env().procedure(consume(TokenType.SYMBOL).getLexeme());
 
             while (!check(TokenType.NEWLINE)) {
                 advance();

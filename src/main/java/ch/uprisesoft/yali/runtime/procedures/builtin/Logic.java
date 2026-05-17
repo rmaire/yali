@@ -15,14 +15,16 @@
  */
 package ch.uprisesoft.yali.runtime.procedures.builtin;
 
-import ch.uprisesoft.yali.ast.node.Procedure;
 import ch.uprisesoft.yali.ast.node.Node;
 import ch.uprisesoft.yali.ast.node.NodeType;
+import ch.uprisesoft.yali.ast.node.Procedure;
 import ch.uprisesoft.yali.ast.node.word.BooleanWord;
 import ch.uprisesoft.yali.ast.node.word.Word;
 import ch.uprisesoft.yali.exception.NodeTypeException;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
 import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
+
+import java.util.Optional;
 
 /**
  *
@@ -30,39 +32,39 @@ import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
  */
 public class Logic implements ProcedureProvider {
 
-    public Node equal(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> equal(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
         if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.INTEGER)) {
-            return Word.bool(left.getInteger().equals(right.getInteger()));
+            return Optional.of(Word.bool(left.getInteger().equals(right.getInteger())));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.FLOAT)) {
-            return Word.bool(left.getFloat().equals(right.getFloat()));
+            return Optional.of(Word.bool(left.getFloat().equals(right.getFloat())));
         } else if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.FLOAT)) {
-            return Word.bool(Double.valueOf(left.getInteger().toString()).equals(right.getFloat()));
+            return Optional.of(Word.bool(Double.valueOf(left.getInteger().toString()).equals(right.getFloat())));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.INTEGER)) {
-            return Word.bool(left.getFloat().equals(Double.valueOf(right.getInteger().toString())));
+            return Optional.of(Word.bool(left.getFloat().equals(Double.valueOf(right.getInteger().toString()))));
         } else if (left.type().equals(NodeType.QUOTE) && right.type().equals(NodeType.QUOTE)) {
-            return Word.bool(left.getQuote().equals(right.getQuote()));
+            return Optional.of(Word.bool(left.getQuote().equals(right.getQuote())));
         } else if (left.type().equals(NodeType.SYMBOL) && right.type().equals(NodeType.SYMBOL)) {
-            return Word.bool(left.getSymbol().equals(right.getSymbol()));
+            return Optional.of(Word.bool(left.getSymbol().equals(right.getSymbol())));
         } else if (left.type().equals(NodeType.BOOLEAN) && right.type().equals(NodeType.BOOLEAN)) {
-            return Word.bool(left.getBoolean().equals(right.getBoolean()));
+            return Optional.of(Word.bool(left.getBoolean().equals(right.getBoolean())));
         }
 
-        return Word.bool(Boolean.FALSE);
+        return Optional.of(Word.bool(Boolean.FALSE));
     }
 
-    public Node inequal(Interpreter interpreter, java.util.List<Node> args) {
-        Node result = equal(interpreter, args);
+    public Optional<Node> inequal(Interpreter interpreter, java.util.List<Node> args) {
+        Node result = equal(interpreter, args).get();
         if (result.toBooleanWord().getBoolean()) {
-            return new BooleanWord(Boolean.FALSE);
+            return Optional.of(new BooleanWord(Boolean.FALSE));
         } else {
-            return new BooleanWord(Boolean.TRUE);
+            return Optional.of(new BooleanWord(Boolean.TRUE));
         }
     }
 
-    public Node greater(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> greater(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
         
@@ -86,10 +88,10 @@ public class Logic implements ProcedureProvider {
             result = Word.bool(left.getFloat() > right.getInteger());
         }
 
-        return result;
+        return Optional.of(result);
     }
 
-    public Node less(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> less(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
@@ -105,51 +107,51 @@ public class Logic implements ProcedureProvider {
             result = Word.bool(left.getFloat() < right.getInteger());
         }
 
-        return result;
+        return Optional.of(result);
     }
 
-    public Node greaterorequal(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> greaterorequal(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
         if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.INTEGER)) {
-            return Word.bool(left.getInteger() >= right.getInteger());
+            return Optional.of(Word.bool(left.getInteger() >= right.getInteger()));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.FLOAT)) {
-            return Word.bool(left.getFloat() >= right.getFloat());
+            return Optional.of(Word.bool(left.getFloat() >= right.getFloat()));
         } else if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.FLOAT)) {
-            return Word.bool(left.getInteger() >= right.getFloat());
+            return Optional.of(Word.bool(left.getInteger() >= right.getFloat()));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.INTEGER)) {
-            return Word.bool(left.getFloat() >= right.getInteger());
+            return Optional.of(Word.bool(left.getFloat() >= right.getInteger()));
         }
 
-        return Word.bool(Boolean.FALSE);
+        return Optional.of(Word.bool(Boolean.FALSE));
     }
 
-    public Node lessorequal(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> lessorequal(Interpreter interpreter, java.util.List<Node> args) {
         Word left = (Word) args.get(0);
         Word right = (Word) args.get(1);
 
         if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.INTEGER)) {
-            return Word.bool(left.getInteger() <= right.getInteger());
+            return Optional.of(Word.bool(left.getInteger() <= right.getInteger()));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.FLOAT)) {
-            return Word.bool(left.getFloat() <= right.getFloat());
+            return Optional.of(Word.bool(left.getFloat() <= right.getFloat()));
         } else if (left.type().equals(NodeType.INTEGER) && right.type().equals(NodeType.FLOAT)) {
-            return Word.bool(left.getInteger() <= right.getFloat());
+            return Optional.of(Word.bool(left.getInteger() <= right.getFloat()));
         } else if (left.type().equals(NodeType.FLOAT) && right.type().equals(NodeType.INTEGER)) {
-            return Word.bool(left.getFloat() <= right.getInteger());
+            return Optional.of(Word.bool(left.getFloat() <= right.getInteger()));
         }
 
-        return Word.bool(Boolean.FALSE);
+        return Optional.of(Word.bool(Boolean.FALSE));
     }
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("equal?", this::equal, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("notequal?", this::inequal, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("less?", this::less, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("greater?", this::greater, () ->false, "__fst__", "__snd__"));
-        it.env().define(new Procedure("greaterequal?", this::greaterorequal, () ->false, "__fst", "__snd__"));
-        it.env().define(new Procedure("lessequal?", this::lessorequal, () ->false, "__fst__", "__snd__"));
+        it.env().define(new Procedure("equal?", this::equal, "__fst__", "__snd__"));
+        it.env().define(new Procedure("notequal?", this::inequal, "__fst__", "__snd__"));
+        it.env().define(new Procedure("less?", this::less, "__fst__", "__snd__"));
+        it.env().define(new Procedure("greater?", this::greater, "__fst__", "__snd__"));
+        it.env().define(new Procedure("greaterequal?", this::greaterorequal, "__fst", "__snd__"));
+        it.env().define(new Procedure("lessequal?", this::lessorequal, "__fst__", "__snd__"));
 
         return it;
     }

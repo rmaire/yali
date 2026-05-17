@@ -15,10 +15,7 @@
  */
 package ch.uprisesoft.yali.runtime.procedures.builtin;
 
-import ch.uprisesoft.yali.ast.node.Procedure;
-import ch.uprisesoft.yali.ast.node.List;
-import ch.uprisesoft.yali.ast.node.Node;
-import ch.uprisesoft.yali.ast.node.NodeType;
+import ch.uprisesoft.yali.ast.node.*;
 import ch.uprisesoft.yali.exception.NodeTypeException;
 import ch.uprisesoft.yali.ast.node.word.QuotedWord;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
@@ -27,6 +24,8 @@ import ch.uprisesoft.yali.runtime.io.InputReceiver;
 import ch.uprisesoft.yali.runtime.io.OutputObserver;
 import ch.uprisesoft.yali.runtime.io.OutputSubject;
 import java.util.ArrayList;
+import java.util.Optional;
+
 import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
 
 /**
@@ -38,7 +37,7 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
     private final java.util.List<OutputObserver> observers = new ArrayList<>();
     private InputGenerator generator;
 
-    public Node print(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> print(Interpreter interpreter, java.util.List<Node> args) {
         java.util.List<Node> concreteArgs = new ArrayList<>();
         
         List returnValue = new List();
@@ -61,43 +60,43 @@ public class IO implements ProcedureProvider, OutputSubject, InputReceiver {
 
         inform(String.join(" ", stringifiedArgs) + "\n");
 
-        return returnValue;
+        return Optional.of(returnValue);
     }
 
-    public Node show(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> show(Interpreter interpreter, java.util.List<Node> args) {
 		java.util.List<String> stringifiedArgs = new ArrayList<>(interpreter.stringify(args));
 
         inform(String.join(" ", stringifiedArgs) + "\n");
-        return Node.nil();
+        return Optional.of(Node.nil());
     }
 
-    public Node type(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> type(Interpreter interpreter, java.util.List<Node> args) {
 		java.util.List<String> stringifiedArgs = new ArrayList<>(interpreter.stringify(args));
 
         inform(String.join(" ", stringifiedArgs));
-        return Node.nil();
+        return Optional.of(Node.nil());
     }
 
-    public Node readword(Interpreter interpreter, java.util.List<Node> args) {
-		return new QuotedWord(requestLine());
+    public Optional<Node> readword(Interpreter interpreter, java.util.List<Node> args) {
+		return Optional.of(new QuotedWord(requestLine()));
     }
 
-    public Node readlist(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> readlist(Interpreter interpreter, java.util.List<Node> args) {
 
 		String list = "[" +
 				requestLine() +
 				"]";
 
-		return (List) interpreter.read(list);
+		return Optional.ofNullable((List) interpreter.read(list));
     }
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("readword", this::readword, () ->false));
-        it.env().define(new Procedure("readlist", this::readlist, () ->false));
-        it.env().define(new Procedure("show", this::show, () ->false, "__output__"));
-        it.env().define(new Procedure("type", this::type, () ->false, "__output__"));
-        it.env().define(new Procedure("print", this::print, () ->false, "__output__"));
+        it.env().define(new Procedure("readword", this::readword));
+        it.env().define(new Procedure("readlist", this::readlist));
+        it.env().define(new Procedure("show", this::show, "__output__"));
+        it.env().define(new Procedure("type", this::type, "__output__"));
+        it.env().define(new Procedure("print", this::print, "__output__"));
 
         return it;
     }

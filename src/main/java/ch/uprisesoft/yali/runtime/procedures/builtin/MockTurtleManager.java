@@ -15,15 +15,14 @@
  */
 package ch.uprisesoft.yali.runtime.procedures.builtin;
 
-import ch.uprisesoft.yali.ast.node.Procedure;
-import ch.uprisesoft.yali.ast.node.List;
-import ch.uprisesoft.yali.ast.node.Node;
+import ch.uprisesoft.yali.ast.node.*;
 import ch.uprisesoft.yali.exception.NodeTypeException;
-import ch.uprisesoft.yali.ast.node.NodeType;
 import ch.uprisesoft.yali.ast.node.word.IntegerWord;
 
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
 import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
+
+import java.util.Optional;
 
 /**
  *
@@ -33,7 +32,7 @@ public class MockTurtleManager implements ProcedureProvider {
     
     MockTurtle turtle = new MockTurtle();
 
-    public Node fd(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> fd(Interpreter interpreter, java.util.List<Node> args) {
         Node arg = args.get(0);
         IntegerWord resolvedArg;
         if (!arg.type().equals(NodeType.INTEGER)) {
@@ -45,7 +44,7 @@ public class MockTurtleManager implements ProcedureProvider {
         return turtlepos();
     }
 
-    public Node bk(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> bk(Interpreter interpreter, java.util.List<Node> args) {
         Node arg = args.get(0);
         IntegerWord resolvedArg;
         if (!arg.type().equals(NodeType.INTEGER)) {
@@ -57,7 +56,7 @@ public class MockTurtleManager implements ProcedureProvider {
         return turtlepos();
     }
 
-    public Node lt(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> lt(Interpreter interpreter, java.util.List<Node> args) {
         Node arg = args.get(0);
         IntegerWord resolvedArg;
         if (!arg.type().equals(NodeType.INTEGER)) {
@@ -69,7 +68,7 @@ public class MockTurtleManager implements ProcedureProvider {
         return turtlepos();
     }
 
-    public Node rt(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> rt(Interpreter interpreter, java.util.List<Node> args) {
         Node arg = args.get(0);
         IntegerWord resolvedArg;
         if (!arg.type().equals(NodeType.INTEGER)) {
@@ -81,25 +80,25 @@ public class MockTurtleManager implements ProcedureProvider {
         return turtlepos();
     }
 
-    public Node turtlepos(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> turtlepos(Interpreter interpreter, java.util.List<Node> args) {
         return turtlepos();
     }
     
-    private Node turtlepos() {
+    private Optional<Node> turtlepos() {
         TurtlePosition tp = turtle.getPosition();
         List pos = new List();
         pos.addChild(new IntegerWord(Math.round(tp.x)));
         pos.addChild(new IntegerWord(Math.round(tp.y)));
-        return pos;
+        return Optional.of(pos);
     }
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
-        it.env().define(new Procedure("fd", this::fd, () ->false, "__dist__"));
-        it.env().define(new Procedure("bk", this::bk, () ->false, "__dist__"));
-        it.env().define(new Procedure("lt", this::lt, () ->false, "__angle__"));
-        it.env().define(new Procedure("rt", this::rt, () ->false, "__angle__"));
-        it.env().define(new Procedure("turtlepos", this::turtlepos, () ->false));
+        it.env().define(new Procedure("fd", this::fd, "__dist__"));
+        it.env().define(new Procedure("bk", this::bk, "__dist__"));
+        it.env().define(new Procedure("lt", this::lt, "__angle__"));
+        it.env().define(new Procedure("rt", this::rt, "__angle__"));
+        it.env().define(new Procedure("turtlepos", this::turtlepos));
 
         return it;
     }

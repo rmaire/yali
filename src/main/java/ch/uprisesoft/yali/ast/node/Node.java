@@ -22,7 +22,6 @@ import ch.uprisesoft.yali.ast.node.word.IntegerWord;
 import ch.uprisesoft.yali.ast.node.word.NilWord;
 import ch.uprisesoft.yali.ast.node.word.NoWord;
 import ch.uprisesoft.yali.ast.node.word.QuotedWord;
-import ch.uprisesoft.yali.ast.node.word.ReferenceWord;
 import ch.uprisesoft.yali.ast.node.word.SymbolWord;
 import ch.uprisesoft.yali.lexer.Token;
 import java.util.ArrayList;

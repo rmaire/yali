@@ -15,16 +15,14 @@
  */
 package ch.uprisesoft.yali.runtime.procedures.builtin;
 
-import ch.uprisesoft.yali.ast.node.Call;
-import ch.uprisesoft.yali.ast.node.Procedure;
-import ch.uprisesoft.yali.ast.node.Node;
+import ch.uprisesoft.yali.ast.node.*;
 import ch.uprisesoft.yali.exception.NodeTypeException;
-import ch.uprisesoft.yali.ast.node.NodeType;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
 import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
 import ch.uprisesoft.yali.scope.VariableNotFoundException;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 /**
  *
@@ -33,11 +31,11 @@ import java.util.ArrayList;
 public class Control implements ProcedureProvider {
 
 	// Only here so we don't have to strip it out as edge cases in the Reader. Does nothing.
-	public Node alias(Interpreter interpreter, java.util.List<Node> args) {
-		return Node.nil();
+	public Optional<Node> alias(Interpreter interpreter, java.util.List<Node> args) {
+		return Optional.of(Node.nil());
 	}
 
-	public Node thing(Interpreter interpreter, java.util.List<Node> args) {
+	public Optional<Node> thing(Interpreter interpreter, java.util.List<Node> args) {
 
 		final String name;
 		switch (args.get(0).type()) {
@@ -55,10 +53,10 @@ public class Control implements ProcedureProvider {
 			throw new VariableNotFoundException(name);
 		}
 
-		return interpreter.env().thing(name);
+		return Optional.ofNullable(interpreter.env().thing(name));
 	}
 
-	public Node local(Interpreter interpreter, java.util.List<Node> args) {
+	public Optional<Node> local(Interpreter interpreter, java.util.List<Node> args) {
 		final String name;
 
 		switch (args.get(0).type()) {
@@ -75,10 +73,10 @@ public class Control implements ProcedureProvider {
 		interpreter.tracers().forEach(t -> t.local(name, interpreter.env()));
 		interpreter.env().local(name);
 
-		return Node.nil();
+		return Optional.of(Node.nil());
 	}
 
-	public Node make(Interpreter interpreter, java.util.List<Node> args) {
+	public Optional<Node> make(Interpreter interpreter, java.util.List<Node> args) {
 		final Node newVar;
 		final String name;
 
@@ -97,10 +95,10 @@ public class Control implements ProcedureProvider {
 
 		interpreter.env().make(name, newVar);
 
-		return newVar;
+		return Optional.ofNullable(newVar);
 	}
 
-	public Node localmake(Interpreter interpreter, java.util.List<Node> args) {
+	public Optional<Node> localmake(Interpreter interpreter, java.util.List<Node> args) {
 		Node newVar;
 		String name;
 
@@ -119,12 +117,12 @@ public class Control implements ProcedureProvider {
 		interpreter.env().local(name);
 		interpreter.env().make(name, newVar);
 
-		return newVar;
+		return Optional.ofNullable(newVar);
 	}
 
 	private java.util.List<Node> ifexprsToRun;
 
-	public Node ifexpr(Interpreter interpreter, java.util.List<Node> args) {
+	public Optional<Node> ifexpr(Interpreter interpreter, java.util.List<Node> args) {
 		Node result = Node.none();
 
 		if (ifexprsToRun == null) {
@@ -143,7 +141,7 @@ public class Control implements ProcedureProvider {
 				ifexprsToRun.addAll(ast.getChildren());
 			} else {
 //                result = it.output(Node.nil());
-				return Node.nil();
+				return Optional.of(Node.nil());
 			}
 
 		}
@@ -153,7 +151,7 @@ public class Control implements ProcedureProvider {
 			interpreter.schedule(next);
 		}
 
-		return result;
+		return Optional.of(result);
 	}
 
 	private Boolean ifexprFinished() {
@@ -167,7 +165,7 @@ public class Control implements ProcedureProvider {
 
 	private java.util.List<Node> ifelseexprsToRun;
 
-	public Node ifelseexpr(Interpreter interpreter, java.util.List<Node> args) {
+	public Optional<Node> ifelseexpr(Interpreter interpreter, java.util.List<Node> args) {
 		Node result = Node.none();
 
 		if (ifelseexprsToRun == null) {
@@ -195,7 +193,12 @@ public class Control implements ProcedureProvider {
 			interpreter.schedule(next);
 		}
 
-		return result;
+		if (ifelseexprsToRun.isEmpty()) {
+			ifelseexprsToRun = null;
+			return Optional.of(result);
+		}
+
+		return Optional.empty();
 	}
 
 	private Boolean ifelseexprFinished() {
@@ -209,7 +212,7 @@ public class Control implements ProcedureProvider {
 
 	private java.util.List<Node> repeatexprToRun;
 
-	public Node repeat(Interpreter interpreter, java.util.List<Node> args) {
+	public Optional<Node> repeat(Interpreter interpreter, java.util.List<Node> args) {
 		Node result = Node.none();
 
 		if (repeatexprToRun == null) {
@@ -242,21 +245,17 @@ public class Control implements ProcedureProvider {
 //            it.schedule(it.read("print \"onemore").getChildren().get(0).toProcedureCall());
 		}
 
-		return result;
-	}
-
-	private Boolean repeatexprFinished() {
 		if (repeatexprToRun.isEmpty()) {
 			repeatexprToRun = null;
-			return false;
-		} else {
-			return true;
+			return  Optional.of(result);
 		}
+
+		return Optional.empty();
 	}
 
 	private java.util.List<Node> proceduresToRun;
 
-	public Node run(Interpreter interpreter, java.util.List<Node> args) {
+	public Optional<Node> run(Interpreter interpreter, java.util.List<Node> args) {
 
 		Node result = Node.none();
 
@@ -269,41 +268,37 @@ public class Control implements ProcedureProvider {
 		Call next = proceduresToRun.remove(0).toProcedureCall();
 		interpreter.schedule(next);
 
-		return result;
-	}
-
-	private Boolean runFinished() {
 		if (proceduresToRun.isEmpty()) {
 			proceduresToRun = null;
-			return false;
-		} else {
-			return true;
+			return Optional.of(result);
 		}
+
+		return Optional.empty();
 	}
 
-	public Node output(Interpreter interpreter, java.util.List<Node> args) {
-		return args.get(0);
+	public Optional<Node> output(Interpreter interpreter, java.util.List<Node> args) {
+		return Optional.of(args.get(0));
 	}
 
-	public Node pause(Interpreter interpreter, java.util.List<Node> args) {
+	public Optional<Node> pause(Interpreter interpreter, java.util.List<Node> args) {
 		interpreter.pause();
-		return Node.nil();
+		return Optional.of(Node.nil());
 	}
 
 	@Override
 	public Interpreter registerProcedures(Interpreter it) {
-		it.env().define(new Procedure("alias",  this::alias, () -> false, "__original__", "__alias__"));
-		it.env().define(new Procedure("thing", this::thing, () -> false, "__name__").macro());
-		it.env().define(new Procedure("make", this::make, () -> false, "__name__", "__value__").macro());
-		it.env().define(new Procedure("local", this::local, () -> false, "__name__").macro());
-		it.env().define(new Procedure("localmake", this::localmake, () -> false, "__name__", "__value__").macro());
-		it.env().define(new Procedure("repeat", this::repeat, this::repeatexprFinished, "__control__", "__block__").macro());
-		it.env().define(new Procedure("run", this::run, this::runFinished, "__block__").macro());
-		it.env().define(new Procedure("output", this::output, () -> false, "__block__"));
-		it.env().define(new Procedure("stop", this::output, () -> false));
-		it.env().define(new Procedure("ifelse", this::ifelseexpr, this::ifelseexprFinished, "__condition__", "__iftrue__", "__iffalse__").macro());
-		it.env().define(new Procedure("if", this::ifexpr, this::ifexprFinished, "__condition__", "__iftrue__").macro());
-		it.env().define(new Procedure("pause", this::pause, () -> false).macro());
+		it.env().define(new Procedure("alias",  this::alias, "__original__", "__alias__"));
+		it.env().define(new Procedure("thing", this::thing, "__name__").macro());
+		it.env().define(new Procedure("make", this::make, "__name__", "__value__").macro());
+		it.env().define(new Procedure("local", this::local, "__name__").macro());
+		it.env().define(new Procedure("localmake", this::localmake, "__name__", "__value__").macro());
+		it.env().define(new Procedure("repeat", this::repeat, "__control__", "__block__").macro());
+		it.env().define(new Procedure("run", this::run, "__block__").macro());
+		it.env().define(new Procedure("output", this::output, "__block__"));
+		it.env().define(new Procedure("stop", this::output));
+		it.env().define(new Procedure("ifelse", this::ifelseexpr, "__condition__", "__iftrue__", "__iffalse__").macro());
+		it.env().define(new Procedure("if", this::ifexpr, "__condition__", "__iftrue__").macro());
+		it.env().define(new Procedure("pause", this::pause).macro());
 
 		return it;
 	}

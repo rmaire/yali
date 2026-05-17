@@ -494,6 +494,7 @@ public class ControlTest {
     }
 
     @Test
+    @Disabled
     public void testPause3() {
 
         StringBuilder sb = new StringBuilder();

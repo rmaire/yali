@@ -15,13 +15,12 @@
  */
 package ch.uprisesoft.yali.runtime.procedures.builtin;
 
-import ch.uprisesoft.yali.ast.node.Call;
-import ch.uprisesoft.yali.ast.node.Procedure;
-import ch.uprisesoft.yali.ast.node.Node;
+import ch.uprisesoft.yali.ast.node.*;
 import ch.uprisesoft.yali.exception.NodeTypeException;
-import ch.uprisesoft.yali.ast.node.NodeType;
 import ch.uprisesoft.yali.runtime.interpreter.Interpreter;
 import java.util.ArrayList;
+import java.util.Optional;
+
 import ch.uprisesoft.yali.runtime.procedures.ProcedureProvider;
 
 /**
@@ -36,7 +35,7 @@ public class Template implements ProcedureProvider {
     private boolean mapIsList = false;
     private boolean mapRunning = false;
 
-    public Node map(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> map(Interpreter interpreter, java.util.List<Node> args) {
         if (interpreter.env().peek().thingable("__last_map_result__")) {
             Node res = interpreter.env().peek().thing("__last_map_result__");
             mapResults.add(res);
@@ -45,7 +44,7 @@ public class Template implements ProcedureProvider {
 
         if (mapRunning && mapValues.isEmpty()) {
             mapRunning = false;
-            return mapResult(interpreter);
+            return Optional.of(mapResult(interpreter));
         }
 
         if (!mapRunning) {
@@ -84,17 +83,7 @@ public class Template implements ProcedureProvider {
         Call c = interpreter.read("make \"__last_map_result__ " + realizedString).getChildren().get(0).toProcedureCall();
         interpreter.schedule(c);
 
-        return mapResult(interpreter);
-    }
-
-    public Boolean mapFinished() {
-        if (!mapRunning) {
-            mapResults.clear();
-            mapTemplate = Node.none();
-            mapValues = new ArrayList<>();
-            return false;
-        }
-        return true;
+        return Optional.empty();
     }
 
     private Node mapResult(Interpreter it) {
@@ -117,7 +106,7 @@ public class Template implements ProcedureProvider {
     private boolean filterIsList = false;
     private boolean filterRunning = false;
 
-    public Node filter(Interpreter interpreter, java.util.List<Node> args) {
+    public Optional<Node> filter(Interpreter interpreter, java.util.List<Node> args) {
         if (interpreter.env().peek().thingable("__last_filter_result__")) {
             Node res = interpreter.env().peek().thing("__last_filter_result__");
             if (res.type().equals(NodeType.BOOLEAN) && res.toBooleanWord().getBoolean() == true) {
@@ -129,7 +118,7 @@ public class Template implements ProcedureProvider {
 
         if (filterRunning && filterValues.isEmpty()) {
             filterRunning = false;
-            return filterResult(interpreter);
+            return Optional.ofNullable(filterResult(interpreter));
         }
 
         if (!filterRunning) {
@@ -168,17 +157,7 @@ public class Template implements ProcedureProvider {
         Call c = interpreter.read("make \"__last_filter_result__ " + realizedString).getChildren().get(0).toProcedureCall();
         interpreter.schedule(c);
 
-        return filterResult(interpreter);
-    }
-
-    public Boolean filterFinished() {
-        if (!filterRunning) {
-            filterResults.clear();
-            filterTemplate = Node.none();
-            filterValues = new ArrayList<>();
-            return false;
-        }
-        return true;
+        return Optional.empty();
     }
 
     private Node filterResult(Interpreter it) {
@@ -267,8 +246,8 @@ public class Template implements ProcedureProvider {
     @Override
     public Interpreter registerProcedures(Interpreter it) {
 
-        it.env().define(new Procedure("map", this::map, this::mapFinished, "__template__", "__values__").macro());
-        it.env().define(new Procedure("filter", this::filter, this::filterFinished, "__template__", "__values__").macro());
+        it.env().define(new Procedure("map", this::map, "__template__", "__values__").macro());
+        it.env().define(new Procedure("filter", this::filter, "__template__", "__values__").macro());
 //        it.env().define(new Procedure("find", (scope, val) -> this.find(scope, val), (scope, val) -> Node.none(), "__template__", "__values__"));
 
         return it;

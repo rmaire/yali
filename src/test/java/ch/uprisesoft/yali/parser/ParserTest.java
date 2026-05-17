@@ -15,9 +15,9 @@
  */
 package ch.uprisesoft.yali.parser;
 
-import ch.uprisesoft.yali.ast.node.Procedure;
 import ch.uprisesoft.yali.ast.node.Node;
 import ch.uprisesoft.yali.ast.node.NodeType;
+import ch.uprisesoft.yali.ast.node.Procedure;
 import ch.uprisesoft.yali.helper.ObjectMother;
 import ch.uprisesoft.yali.lexer.Lexer;
 import ch.uprisesoft.yali.runtime.interpreter.UnthreadedInterpreter;
@@ -332,7 +332,7 @@ public class ParserTest {
     public void testFunDefLiteral() {
         
         Parser p = parseAndReturnParser("TO bla :blubb :bli\nprint [Hello World]\nfd 100\nEND");
-        Procedure result = p.getFunctions().env().procedure("bla").toProcedureDef();
+        Procedure result = (Procedure) p.getFunctions().env().procedure("bla").toProcedureDef();
 
         assertThat(result.type(), is(NodeType.PROCEDURE));
         assertThat(result.getName(), is("bla"));
@@ -368,7 +368,7 @@ public class ParserTest {
 
 //        Node result = read(sb.toString());
         Parser p = parseAndReturnParser(sb.toString());
-        Procedure result = p.getFunctions().env().procedure("bla").toProcedureDef();
+        Procedure result = (Procedure) p.getFunctions().env().procedure("bla").toProcedureDef();
 
         assertThat(result.type(), is(NodeType.PROCEDURE));
         assertThat(result.getName(), is("bla"));

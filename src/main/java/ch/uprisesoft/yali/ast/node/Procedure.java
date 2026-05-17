@@ -20,8 +20,8 @@ import ch.uprisesoft.yali.runtime.procedures.FunctionType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 /**
  *
@@ -30,31 +30,30 @@ import java.util.function.Supplier;
 public class Procedure extends Node {
 
     private String name;
-    private java.util.List<String> args = new ArrayList<>();
-    private BiFunction<Interpreter, java.util.List<Node>, Node> nativeCall;
-    private Supplier<Boolean> hasMoreCallback;
+    private List<String> args = new ArrayList<>();
+    private BiFunction<Interpreter, List<Node>, Optional<Node>> nativeCall;
     private String source;
 
     FunctionType funType = FunctionType.YALI;
 
-    public Procedure() {
+/*    public SimpleProcedure() {
         super(NodeType.PROCEDURE);
-    }
+    }*/
 
     public Procedure(String name) {
-        this();
+	    super(NodeType.PROCEDURE);
+		//this();
         this.name = name;
     }
-    
-    public Procedure(String name, 
-            BiFunction<Interpreter, java.util.List<Node>, Node> nativeCall,
-                     Supplier<Boolean> hasMoreCallback,
-            String... args) {
-        this();
+
+    public Procedure(String name,
+                     BiFunction<Interpreter, List<Node>, Optional<Node>> nativeCall,
+                     String... args) {
+	    super(NodeType.PROCEDURE);
+		//this();
         this.funType = FunctionType.NATIVE;
         this.name = name;
         this.nativeCall = nativeCall;
-        this.hasMoreCallback = hasMoreCallback;
         this.args.addAll(Arrays.asList(args));
     }
     
@@ -63,12 +62,8 @@ public class Procedure extends Node {
         return this;
     }
 
-    public BiFunction<Interpreter, java.util.List<Node>, Node> getNativeCall() {
+    public BiFunction<Interpreter, List<Node>, Optional<Node>> getSimpleNativeCall() {
         return nativeCall;
-    }
-    
-    public Supplier<Boolean> getHasMoreCallback() {
-        return hasMoreCallback;
     }
 
     public Boolean isNative() {
