@@ -151,17 +151,14 @@ public class Control implements ProcedureProvider {
 			interpreter.schedule(next);
 		}
 
-		return Optional.of(result);
-	}
-
-	private Boolean ifexprFinished() {
 		if (ifexprsToRun.isEmpty()) {
 			ifexprsToRun = null;
-			return false;
-		} else {
-			return true;
+			return Optional.of(result);
 		}
+
+			return Optional.empty();
 	}
+
 
 	private java.util.List<Node> ifelseexprsToRun;
 
@@ -199,15 +196,6 @@ public class Control implements ProcedureProvider {
 		}
 
 		return Optional.empty();
-	}
-
-	private Boolean ifelseexprFinished() {
-		if (ifelseexprsToRun.isEmpty()) {
-			ifelseexprsToRun = null;
-			return false;
-		} else {
-			return true;
-		}
 	}
 
 	private java.util.List<Node> repeatexprToRun;

@@ -156,8 +156,30 @@ public class InterpreterTest {
     }
 
     @Test
+    public void testRecursion2() {
+        String input = "to recurse :i\n"
+                + "print :i\n"
+                + "ifelse (:i > 0) [recurse :i - 1] [print \"finished]\n"
+                + "end\n"
+                + "\n"
+                + "recurse 100\n";
+
+        Node res = it.run(it.read(input));
+
+        assertThat(outputs.size(), is(102));
+
+        for (int i = 100; i >= 0; i--) {
+            assertThat(outputs.get(100 - i), is(i + "\n"));
+        }
+
+        assertThat(outputs.get(101), is("finished\n"));
+
+    }
+
+    @Test
     public void testNestedRunList() {
-        String input = "to testit :i\n"
+        String input =
+                "to testit :i\n"
                 + "if (:i < 10) [print \"first if (:i > 5) [print \"yes]]\n"
                 + "end\n"
                 + "\n"
@@ -168,6 +190,19 @@ public class InterpreterTest {
         assertThat(outputs.size(), is(2));
         assertThat(outputs.get(0), is("first\n"));
         assertThat(outputs.get(1), is("yes\n"));
+    }
+
+    @Test
+    public void testNestedRunList2() {
+        String input = "make \"test 1\n"
+                + "run [make \"test :test + 1 run [make \"test :test + 1]]\n"
+                + "print :test\n";
+
+        Node res = it.run(it.read(input));
+
+        assertThat(outputs.size(), is(1));
+        assertThat(outputs.get(0), is("3\n"));
+        //assertThat(outputs.get(1), is("yes\n"));
     }
 
     @Test
