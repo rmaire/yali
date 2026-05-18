@@ -25,6 +25,7 @@ public class SymbolWord extends Word {
 
     public SymbolWord(String string) {
         super(NodeType.SYMBOL);
+        this.stringWord = string;
         this.symbolWord = string;
         
     }    

@@ -118,7 +118,7 @@ public abstract class Word extends Node {
         }
         
         if (this.type.equals(NodeType.SYMBOL) && other.type.equals(NodeType.QUOTE)) {
-            return this.getString().equals(other.getQuote());
+            return this.getSymbol().equals(other.getQuote());
         }
         
         if (this.type.equals(NodeType.QUOTE) && other.type.equals(NodeType.SYMBOL)) {

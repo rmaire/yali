@@ -174,81 +174,84 @@ public class Template implements ProcedureProvider {
         }
     }
 
-//    // TODO
-//    public Node find(Scope scope, java.util.List<Node> args) {
-//        Node template = Node.none();
-//
-//        if (args.get(0).type().equals(NodeType.LIST)) {
-//            template = args.get(0).toList();
-//        } else {
-//            throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.LIST);
-//        }
-//
-//        if (args.get(1).type().equals(NodeType.LIST)) {
-//            Node values = args.get(1).toList();
-//
-//            for (int i = 0; i < values.getChildren().size(); i++) {
-//                Node val = values.getChildren().get(i);
-//                java.util.List<Node> realizedValues = new ArrayList<>();
-//                for (Node n : template.getChildren()) {
-//                    if (n.type().equals(NodeType.SYMBOL) && n.toSymbolWord().getSymbol().equals("?")) {
-//                        realizedValues.add(val);
-//                    } else {
-//                        realizedValues.add(n);
-//                    }
-//                }
-//                List l = new List(realizedValues);
-//                String runCommand = l.toString().substring(1, l.toString().length() - 1);
-//                Node result = it.runBounded(it.read(runCommand));
-//
-//                if (!result.type().equals(NodeType.BOOLEAN)) {
-//                    throw new NodeTypeException(template, result.type(), NodeType.BOOLEAN);
-//                }
-//
-//                if (result.toBooleanWord().getBoolean()) {
-//                    return val;
-//                }
-//            }
-//
-//        } else if (args.get(1).type().equals(NodeType.QUOTE)) {
-//            String values = args.get(1).toQuotedWord().getQuote();
-//
-//            for (int i = 0; i < values.length(); i++) {
-//                Character val = values.charAt(i);
-//                java.util.List<Node> realizedValues = new ArrayList<>();
-//                for (Node n : template.getChildren()) {
-//                    if (n.type().equals(NodeType.SYMBOL) && n.toSymbolWord().getSymbol().equals("?")) {
-//                        realizedValues.add(Node.symbol("\"" + String.valueOf(val)));
-//                    } else {
-//                        realizedValues.add(n);
-//                    }
-//                }
-//                List l = new List(realizedValues);
-//                String runCommand = l.toString().substring(1, l.toString().length() - 1);
-//                Node result = it.runBounded(it.read(runCommand));
-//
-//                if (!result.type().equals(NodeType.BOOLEAN)) {
-//                    throw new NodeTypeException(template, result.type(), NodeType.BOOLEAN);
-//                }
-//
-//                if (result.toBooleanWord().getBoolean()) {
-//                    return Node.quote(String.valueOf(val));
-//                }
-//            }
-//
-//        } else {
-//            throw new NodeTypeException(args.get(1), args.get(1).type(), NodeType.LIST, NodeType.QUOTE);
-//        }
-//
-//        return Node.nil();
-//    }
+    private Node findTemplate = Node.none();
+    private Node potentialFindResult = Node.nil();
+    private java.util.List<Node> findValues = new ArrayList<>();
+    private boolean findIsList = false;
+    private boolean findRunning = false;
+
+    public Optional<Node> find(Interpreter interpreter, java.util.List<Node> args) {
+        if (interpreter.env().peek().thingable("__last_find_result__")) {
+            Node res = interpreter.env().peek().thing("__last_find_result__");
+            if (res.type().equals(NodeType.BOOLEAN) && res.toBooleanWord().getBoolean() == true) {
+                Node val = interpreter.env().peek().thing("__last_find_result__");
+                interpreter.env().peek().unmake("__last_find_result__");
+                findRunning = false;
+                findIsList = false;
+                findValues.clear();
+                findTemplate = Node.none();
+                System.out.println("Found value: " + potentialFindResult);
+                return Optional.of(potentialFindResult);
+            }
+            findValues.remove(0);
+            interpreter.env().peek().unmake("__last_find_result__");
+        }
+
+        if (findRunning && findValues.isEmpty()) {
+            findRunning = false;
+            return Optional.of(Node.none());
+        }
+
+        if (!findRunning) {
+            if (args.get(0).type().equals(NodeType.LIST)) {
+                findTemplate = args.get(0).toList();
+            } else {
+                throw new NodeTypeException(args.get(0), args.get(0).type(), NodeType.LIST);
+            }
+
+            if (args.get(1).type().equals(NodeType.LIST)) {
+                findValues = args.get(1).toList().getChildren();
+                findIsList = true;
+            } else if (args.get(1).type().equals(NodeType.QUOTE)) {
+                String valueChars = args.get(1).toQuotedWord().getQuote();
+                for (int i = 0; i < valueChars.length(); i++) {
+                    findValues.add(
+                            Node.symbol(
+                                    String.valueOf(valueChars.charAt(i))
+                            )
+                    );
+                }
+                findIsList = false;
+            } else {
+                throw new NodeTypeException(args.get(1), args.get(1).type(), NodeType.LIST, NodeType.QUOTE);
+            }
+            findRunning = true;
+        }
+
+        Node val = findValues.get(0);
+        java.util.List<Node> realizedValues = new ArrayList<>();
+        for (Node n : findTemplate.getChildren()) {
+            if (n.type().equals(NodeType.SYMBOL) && n.toSymbolWord().getSymbol().equals("?")) {
+                potentialFindResult = val;
+                realizedValues.add(val);
+            } else {
+                realizedValues.add(n);
+            }
+        }
+
+        String realizedString = Node.list(realizedValues).toString().substring(1, Node.list(realizedValues).toString().length() - 1);
+        Call c = interpreter.read("make \"__last_find_result__ " + realizedString).getChildren().get(0).toProcedureCall();
+        interpreter.schedule(c);
+
+        return Optional.empty();
+    }
 
     @Override
     public Interpreter registerProcedures(Interpreter it) {
 
         it.env().define(new Procedure("map", this::map, "__template__", "__values__").macro());
         it.env().define(new Procedure("filter", this::filter, "__template__", "__values__").macro());
-//        it.env().define(new Procedure("find", (scope, val) -> this.find(scope, val), (scope, val) -> Node.none(), "__template__", "__values__"));
+        it.env().define(new Procedure("find", this::find, "__template__", "__values__").macro());
 
         return it;
     }
