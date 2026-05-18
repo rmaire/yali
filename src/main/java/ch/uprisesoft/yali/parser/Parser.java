@@ -57,13 +57,15 @@ public class Parser {
     public Node read(ch.uprisesoft.yali.ast.node.List list) {
         tokens.clear();
         
-        StringBuilder newSource = new StringBuilder();
+/*        StringBuilder newSource = new StringBuilder();
         
         for (Token t: list.token().subList(1, list.token().size()-1)) {
             newSource.append(t.getLexeme()).append(" ");
-        }
-        
-        return read(newSource.toString().trim());
+        }*/
+
+        String source = list.source().substring(1, list.source().length()-1);
+
+        return read(source);
     }
 
     private Node read() {
